@@ -12,12 +12,26 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import javax.swing.text.StyledEditorKit;
 
+/**
+ * 字体样式控制器
+ * 
+ * @author OSX
+ *
+ */
 public final class FontStyleController {
-	
+
 	public FontStyleController() {
 		// TODO Auto-generated constructor stub
 	}
 
+	/**
+	 * 设置字体种类, 需要给出一个指针指向目标textPane
+	 * 
+	 * @param textPane
+	 *            目标textPane
+	 * @param fontFamily
+	 *            新的字体种类
+	 */
 	public static void setFontFamily(final JTextPane textPane, String fontFamily) {
 		if (textPane != null) {
 			MutableAttributeSet attr = textPane.getInputAttributes();
@@ -25,7 +39,15 @@ public final class FontStyleController {
 			setCharacterAttributes(textPane, attr, false);
 		}
 	}
-	
+
+	/**
+	 * 设置字体大小, 需要给出一个指针指向目标textPane
+	 * 
+	 * @param textPane
+	 *            目标textPane
+	 * @param fontFamily
+	 *            新的字体大小
+	 */
 	public static void setFontSize(final JTextPane textPane, int size) {
 		if (textPane != null) {
 			if (size >= 0 && size <= 512) {
@@ -38,7 +60,16 @@ public final class FontStyleController {
 		}
 	}
 
-	public static void setForeground(final JTextPane textPane, int begin, int end, Color fg, boolean replace) {
+	/**
+	 * 设置字体颜色, 需要给出一个指针指向目标textPane
+	 * 
+	 * @param textPane
+	 *            目标textPane
+	 * @param fontFamily
+	 *            新的字体颜色
+	 */
+	public static void setForeground(final JTextPane textPane, int begin,
+			int end, Color fg, boolean replace) {
 		if (textPane != null) {
 			if (fg != null) {
 				MutableAttributeSet attr = textPane.getInputAttributes();
@@ -49,13 +80,30 @@ public final class FontStyleController {
 			}
 		}
 	}
-	
-	public static void setCharacterAttributes(final JTextPane textPane, AttributeSet attr,
-			boolean replace) {
+
+	/**
+	 * 对整个文档的文字设置属性
+	 * 
+	 * @param textPane
+	 * @param attr
+	 * @param replace
+	 */
+	public static void setCharacterAttributes(final JTextPane textPane,
+			AttributeSet attr, boolean replace) {
 		StyledDocument doc = getStyledDocument(textPane);
 		doc.setCharacterAttributes(0, doc.getLength(), attr, replace);
 	}
 
+	/**
+	 * 对文档的某个区域的文字设置属性, 受影响区域自start到end
+	 * 
+	 * @param textPane
+	 * @param start
+	 * @param end
+	 * @param attr
+	 *            新的属性
+	 * @param replace
+	 */
 	public static void setCharacterAttributes(JTextPane textPane, int start,
 			int end, AttributeSet attr, boolean replace) {
 		StyledDocument doc = getStyledDocument(textPane);
@@ -69,6 +117,12 @@ public final class FontStyleController {
 		inputAttributes.addAttributes(attr);
 	}
 
+	/**
+	 * 返回目标textPane的Document
+	 * 
+	 * @param textPane
+	 * @return
+	 */
 	public static StyledDocument getStyledDocument(final JTextPane textPane) {
 		Document d = textPane.getDocument();
 		if (d instanceof StyledDocument) {
@@ -77,6 +131,12 @@ public final class FontStyleController {
 		throw new IllegalArgumentException("document must be StyledDocument");
 	}
 
+	/**
+	 * 返回目标textPane的Document
+	 * 
+	 * @param textPane
+	 * @return
+	 */
 	public static StyledEditorKit getStyledEditorKit(final JTextPane textPane) {
 		EditorKit k = textPane.getEditorKit();
 		if (k instanceof StyledEditorKit) {

@@ -35,6 +35,11 @@ public final class MessagePanelController {
 		this.textPane = textPane;
 	}
 
+	/**
+	 * 导出textPane中的文字至指定路径
+	 * 
+	 * @param dstPath
+	 */
 	public void export(String dstPath) {
 		if (textPane != null) {
 			Document doc = textPane.getDocument();
@@ -46,6 +51,9 @@ public final class MessagePanelController {
 		}
 	}
 
+	/**
+	 * 清空textPane中的文字
+	 */
 	public void clear() {
 		if (textPane != null) {
 			Document doc = textPane.getDocument();
@@ -58,17 +66,21 @@ public final class MessagePanelController {
 		}
 	}
 
+	/**
+	 * 向textPane中插入一段文字
+	 * 
+	 * @param text
+	 */
 	public void insert(String text) {
 		if (textPane != null) {
-			StyledDocument doc = FontStyleController.getStyledDocument(textPane);
+			StyledDocument doc = FontStyleController
+					.getStyledDocument(textPane);
 
 			MutableAttributeSet attr = textPane.getInputAttributes();
 
 			StyleConstants.setFontFamily(attr,
 					StyleConstants.getFontFamily(attr));
 			StyleConstants.setFontSize(attr, StyleConstants.getFontSize(attr));
-			
-			System.out.println(StyleConstants.getFontSize(attr));
 
 			try {
 				doc.insertString(doc.getLength(), text, attr);
@@ -78,12 +90,21 @@ public final class MessagePanelController {
 		}
 	}
 
+	/**
+	 * 插入一个MessagePacket
+	 * 
+	 * @param packet
+	 */
 	public void insert(MessagePacket packet) {
 		insert(packet.toString());
 	}
 
-	public void insertColored(MessagePacket packet, Color color,
-			boolean replace) {
+	/**
+	 * @param packet
+	 * @param color
+	 * @param replace
+	 */
+	public void insertColored(MessagePacket packet, Color color, boolean replace) {
 		int start = textPane.getCaretPosition();
 		StyledDocument doc = FontStyleController.getStyledDocument(textPane);
 		MutableAttributeSet attr = textPane.getInputAttributes();
@@ -93,8 +114,6 @@ public final class MessagePanelController {
 		StyleConstants.setFontFamily(a, StyleConstants.getFontFamily(attr));
 		StyleConstants.setFontSize(a, StyleConstants.getFontSize(attr));
 		StyleConstants.setForeground(a, color);
-		
-		System.out.println(StyleConstants.getFontSize(attr));
 
 		try {
 			doc.insertString(doc.getLength(), packet.toString(), attr);
