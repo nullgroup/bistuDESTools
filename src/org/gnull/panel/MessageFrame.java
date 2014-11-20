@@ -33,6 +33,7 @@ public class MessageFrame extends JFrame {
 					setLookAndFeel();
 					MessageFrame frame = new MessageFrame();
 					frame.add(new MessagePanel(), BorderLayout.CENTER);
+					frame.add(new ProgressPanel(), BorderLayout.SOUTH);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
