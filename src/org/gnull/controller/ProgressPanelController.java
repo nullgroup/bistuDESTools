@@ -20,6 +20,7 @@ public final class ProgressPanelController {
 	private double md5byte;
 	private double md5currentbyte;
 	private int progress;
+	private boolean flag = true;
 	
 	private Thread Md5thread;
 	private Thread Md5Listener;
@@ -33,7 +34,10 @@ public final class ProgressPanelController {
 		Md5thread = new Thread() {
 			public void run() {
 				System.out.println("Md5 Start!");
-				md5.doMD5(new File("D:\\00004.MTS"), true);
+				if (flag == false) {
+					md5.doMD5(new File("D:\\P1010489.JPG"), true);
+					flag = true;
+				}				
 				System.out.println("Md5 Complete!");
 			}
 		};
@@ -42,14 +46,17 @@ public final class ProgressPanelController {
 			public void run() {
 				System.out.println("Md5Listen Start!");
 				while (true) {
-					md5byte = md5.TOTAL_BYTE;
-					md5currentbyte = md5.ACTUAL_BYTE;
-					System.out.println(md5byte+ "," + md5currentbyte);
-					if (md5byte == -1) continue;
-					progress = (int) ((md5currentbyte / md5byte) * 100);
-					jbutton.setEnabled(false);
-					jprogressbar.setValue(progress);
-					if (progress == 100) break;
+					System.out.println(md5.TOTAL_BYTE+ "," + md5.ACTUAL_BYTE);
+					if (flag == true) {
+						if (md5byte == -1) {
+							flag = false;
+							continue;
+						}
+						progress = (int) (((double) md5.ACTUAL_BYTE / md5.TOTAL_BYTE) * 100);
+						jbutton.setEnabled(false);
+						jprogressbar.setValue(progress);
+						if (md5.TOTAL_BYTE == md5.ACTUAL_BYTE) break;
+					}
 				}
 				jbutton.setEnabled(true);
 				System.out.println("Md5Listen Complete!");
@@ -61,8 +68,8 @@ public final class ProgressPanelController {
 		progresslistener = new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				Md5thread.start();
 				Md5Listener.start();
+				Md5thread.start();
 			}
 			
 		};
