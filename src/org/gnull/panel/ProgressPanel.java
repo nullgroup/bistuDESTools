@@ -35,7 +35,7 @@ public class ProgressPanel extends JPanel{
 		setAlignmentX(TOP_ALIGNMENT);
 		
 		progressbar = new JProgressBar(JProgressBar.HORIZONTAL);
-		progressbar.setMaximum(20);
+		progressbar.setMaximum(100);
 		progressbar.setMinimum(0);
 		progressbar.setValue(0);
 		

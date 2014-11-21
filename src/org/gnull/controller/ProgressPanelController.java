@@ -14,10 +14,12 @@ public final class ProgressPanelController {
 	
 	private JProgressBar jprogressbar;
 	private JButton jbutton;
-	private Timer timer;
 	private ActionListener progresslistener;
 	private ActionListener timerlistener;
 	private MD5Controller md5;
+	private double md5byte;
+	private double md5currentbyte;
+	private int progress;
 	
 	private Thread Md5thread;
 	private Thread Md5Listener;
@@ -26,16 +28,31 @@ public final class ProgressPanelController {
 	public ProgressPanelController(JProgressBar progressbar, JButton button) {
 		setJProgressBar(progressbar);
 		setJButton(button);
+		md5 = new MD5Controller();
 		
 		Md5thread = new Thread() {
 			public void run() {
-				md5 = new MD5Controller();
-				md5.doMD5(new File("\testfile.txt"), true);
+				System.out.println("Md5 Start!");
+				md5.doMD5(new File("D:\\00004.MTS"), true);
+				System.out.println("Md5 Complete!");
 			}
 		};
 		
 		Md5Listener = new Thread() {
 			public void run() {
+				System.out.println("Md5Listen Start!");
+				while (true) {
+					md5byte = md5.TOTAL_BYTE;
+					md5currentbyte = md5.ACTUAL_BYTE;
+					System.out.println(md5byte+ "," + md5currentbyte);
+					if (md5byte == -1) continue;
+					progress = (int) ((md5currentbyte / md5byte) * 100);
+					jbutton.setEnabled(false);
+					jprogressbar.setValue(progress);
+					if (progress == 100) break;
+				}
+				jbutton.setEnabled(true);
+				System.out.println("Md5Listen Complete!");
 				
 			}
 		};
@@ -44,27 +61,12 @@ public final class ProgressPanelController {
 		progresslistener = new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				if (jprogressbar.getValue() < jprogressbar.getMaximum()) {
-					jprogressbar.setValue(jprogressbar.getValue() + 1);
-					jbutton.setEnabled(false);
-				}else {
-					timer.stop();
-					jbutton.setEnabled(true);
-				}
+				Md5thread.start();
+				Md5Listener.start();
 			}
 			
 		};
-		timerlistener = new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
-				jprogressbar.setValue(0);
-				timer.start();
-			}
-			
-		};
-		
-		timer = new Timer(100, progresslistener);
-		button.addActionListener(timerlistener);
+		button.addActionListener(progresslistener);
 	}
 	
 	private void setJProgressBar(JProgressBar jpb) {

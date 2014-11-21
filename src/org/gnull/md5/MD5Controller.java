@@ -60,6 +60,7 @@ public class MD5Controller {
 
 	public static void main(String[] args) throws UnsupportedEncodingException {
 		MD5Controller md5 = new MD5Controller();
+		System.out.printf(md5.doMD5(new File("D:\\00000.MTS"), true));
 		md5.test();
 	}
 
