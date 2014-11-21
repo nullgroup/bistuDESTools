@@ -1,19 +1,15 @@
 package org.gnull.panel;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.Timer;
 
-import org.gnull.controller.MessagePanelController;
 import org.gnull.controller.ProgressPanelController;
 import org.gnull.md5.MD5Controller;
 
