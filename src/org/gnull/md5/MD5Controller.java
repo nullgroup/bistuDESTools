@@ -51,6 +51,9 @@ public class MD5Controller {
 
 	static public final String HEX_VAL_UPPERCASE = "0123456789ABCDEF";
 	static public final String HEX_VAL_LOWERCASE = "0123456789abcdef";
+	
+	public long TOTAL_BYTE = -1L;
+	public long ACTUAL_BYTE = 0L;
 
 	// 保存哈希值
 	private long[] hash = null;
@@ -111,6 +114,33 @@ public class MD5Controller {
 	public String doMD5(File file) {
 		return doMD5(file, false);
 	}
+	
+	private long check(File file) {
+		long length = 0;
+		
+		length = file.length();
+		int r = (int) (length % 64);
+		
+		long bitLength = r * 8;
+
+		int rVal = (int) (bitLength % 512);
+		if (bitLength == 448 || rVal != 448) {
+			// if bitLength == 448
+			// then comple 512 bit (64 byte)
+			int compleByte = (bitLength == 448) ? 64 : (448 - rVal) / 8;
+
+			// rVal > 448
+			if (compleByte < 0) {
+				compleByte += 64;
+			}
+			
+			length += compleByte;
+		}
+		
+		
+		return length;
+		
+	}
 
 	/**
 	 * 对文件进行MD5运算，生成MD5值 
@@ -126,6 +156,7 @@ public class MD5Controller {
 		long byteLength = 0;
 
 		hash = new long[] { CV_A, CV_B, CV_C, CV_D }; // Initialization
+		TOTAL_BYTE = check(file);
 
 		try {
 			in = new FileInputStream(file);
@@ -147,6 +178,7 @@ public class MD5Controller {
 
 				long[] M = doGetPacket(buffer, 0);
 				doMD5Round(M);
+				ACTUAL_BYTE += 64;
 			}
 		} catch (Exception e) {
 			// There is a stub for Client class
