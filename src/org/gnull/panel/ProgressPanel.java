@@ -8,8 +8,10 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.Timer;
 
 import org.gnull.controller.ProgressPanelController;
+import org.gnull.md5.MD5Controller;
 
 public class ProgressPanel extends JPanel{
 	
@@ -18,6 +20,10 @@ public class ProgressPanel extends JPanel{
 	private JProgressBar progressbar;
 	private JButton button;
 	private ProgressPanelController ppc;
+	
+	private Timer timer;
+	
+	private MD5Controller md5;
 	
 	public ProgressPanel() {
 		createProgressPanel();
@@ -29,21 +35,13 @@ public class ProgressPanel extends JPanel{
 		setAlignmentX(TOP_ALIGNMENT);
 		
 		progressbar = new JProgressBar(JProgressBar.HORIZONTAL);
-		progressbar.setMaximum(20);
+		progressbar.setMaximum(100);
 		progressbar.setMinimum(0);
 		progressbar.setValue(0);
 		
 		button = new JButton("测试进度条按钮");
-		button.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
-				ppc = new ProgressPanelController(progressbar);
-				ppc.StartProgressBar();
-			}
-			
-		});
+		ppc = new ProgressPanelController(progressbar, button);
+		
 		add(progressbar, BorderLayout.CENTER);
 		add(button, BorderLayout.SOUTH);
 	}
