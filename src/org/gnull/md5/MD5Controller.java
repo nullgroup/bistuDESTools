@@ -64,15 +64,6 @@ public class MD5Controller {
 	}
 
 	public void test() throws UnsupportedEncodingException {
-		String s1 = "abcdefghijklmnopqrstuvwxyz";
-		String res = "c3fcd3d76192e4007dfb496cca67e13b";
-
-		String md5 = doMD5(s1, false);
-
-		System.out.println("---------- MD5 ----------");
-		System.out.println("Message: " + s1);
-		System.out.println("MD5:     " + md5);
-		System.out.println("Correct: " + res);
 	}
 
 	public String doMD5(String message) throws UnsupportedEncodingException {
@@ -134,9 +125,8 @@ public class MD5Controller {
 				compleByte += 64;
 			}
 			
-			length += compleByte;
+			length += compleByte + 8;
 		}
-		
 		
 		return length;
 		
@@ -157,6 +147,8 @@ public class MD5Controller {
 
 		hash = new long[] { CV_A, CV_B, CV_C, CV_D }; // Initialization
 		TOTAL_BYTE = check(file);
+		
+		System.out.println(TOTAL_BYTE % 64 == 0);
 
 		try {
 			in = new FileInputStream(file);
