@@ -15,6 +15,7 @@ import javax.swing.JToolBar;
 import javax.swing.UIManager;
 
 import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
+import javax.swing.JProgressBar;
 
 public class MainFrame extends JFrame {
 	
@@ -35,6 +36,7 @@ public class MainFrame extends JFrame {
 	private JButton btnClear;
 	private JButton btnExport;
 	private JButton btnStop;
+	private JProgressBar progressBar;
 
 	/**
 	 * Launch the application.
@@ -78,6 +80,12 @@ public class MainFrame extends JFrame {
 		
 		panel = new JPanel();
 		tabbedPane.addTab("a", null, panel, null);
+		
+		progressBar = new JProgressBar();
+		panel.add(progressBar);
+		progressBar.setMinimum(0);
+		progressBar.setMaximum(100);
+		
 		
 		lblSad = new JLabel("sadsdadasdas");
 		panel.add(lblSad);

@@ -64,6 +64,10 @@ public class MD5Controller {
 	}
 
 	public void test() throws UnsupportedEncodingException {
+		File f = new File("d:\\a.exe");
+		doMD5(f);
+		System.out.println(TOTAL_BYTE);
+		System.out.println(ACTUAL_BYTE);
 	}
 
 	public String doMD5(String message) throws UnsupportedEncodingException {

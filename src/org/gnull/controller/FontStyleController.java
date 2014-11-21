@@ -1,9 +1,12 @@
 package org.gnull.controller;
 
 import java.awt.Color;
+import java.awt.Font;
+import java.util.Enumeration;
 
 import javax.swing.JTextPane;
 import javax.swing.UIManager;
+import javax.swing.plaf.FontUIResource;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.Document;
 import javax.swing.text.EditorKit;
@@ -20,9 +23,19 @@ import javax.swing.text.StyledEditorKit;
  */
 public final class FontStyleController {
 
+	public static Font getDefaultFont() {
+		return font;
+	}
+
+	public static void setDefaultFont(Font font) {
+		FontStyleController.font = font;
+	}
+
 	public FontStyleController() {
 		// TODO Auto-generated constructor stub
 	}
+
+	private static Font font;
 
 	/**
 	 * 设置字体种类, 需要给出一个指针指向目标textPane
@@ -143,5 +156,17 @@ public final class FontStyleController {
 			return (StyledEditorKit) k;
 		}
 		throw new IllegalArgumentException("EditorKit must be StyledEditorKit");
+	}
+
+	public static void setGlobalFont(Font font) {
+	    FontUIResource fontRes = new FontUIResource(font);
+	    Enumeration<Object> keys = UIManager.getDefaults().keys();
+	    while (keys.hasMoreElements()) {
+	        Object key = keys.nextElement();
+	        Object value = UIManager.get(key);
+	        if (value instanceof FontUIResource) {
+	            UIManager.put(key, fontRes);
+	        }
+	    }
 	}
 }
