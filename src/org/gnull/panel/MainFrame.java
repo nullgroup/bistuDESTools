@@ -99,16 +99,16 @@ public class MainFrame extends JFrame {
 		toolBar = new JToolBar();
 		getContentPane().add(toolBar, BorderLayout.NORTH);
 		
-		btnBrowse = new JButton(new ImageIcon("/"));
+		btnBrowse = new JButton(new ImageIcon("res/browse/browse.png"));
 		toolBar.add(btnBrowse);
 		
-		btnClear = new JButton("New button");
+		btnClear = new JButton(new ImageIcon("res/clear/clear.png"));
 		toolBar.add(btnClear);
 		
-		btnExport = new JButton("New button");
+		btnExport = new JButton(new ImageIcon("res/export/export.png"));
 		toolBar.add(btnExport);
 		
-		btnStop = new JButton("New button");
+		btnStop = new JButton(new ImageIcon("res/stop/stop.png"));
 		toolBar.add(btnStop);
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
