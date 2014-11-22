@@ -69,7 +69,7 @@ public class MD5Controller {
 	}
 
 	public static void main(String[] args) throws UnsupportedEncodingException {
-		MD5Controller a = new MD5Controller("D:\\Application Setup\\proplussp2013-kb2817430-fullfile-x64-zh-cn.exe");
+		MD5Controller a = new MD5Controller("D:\\桌面杂项\\支教\\P1010432.jpg");
 		System.out.println(a.doMD5());
 		System.out.println(a.getActual());
 		System.out.println(a.getTotal());
