@@ -25,7 +25,7 @@ public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	private MessagePanel messagePane;
-	private ProgressPanel progressPane;
+	// private ProgressPanel progressPane;
 	private JPanel controllPane;
 	private ControllTabbedPanel ctrlTabPane;
 	private FormatPanel forPanel;
@@ -57,7 +57,7 @@ public class MainFrame extends JFrame {
 		toolBar = createToolBar("MainWindow.ToolBar", JToolBar.HORIZONTAL, false);
 		controllPane = new JPanel(new BorderLayout(0, 0));
 		messagePane = new MessagePanel();
-		progressPane = new ProgressPanel();
+		// progressPane = new ProgressPanel();
 		ctrlTabPane = new ControllTabbedPanel();
 		forPanel = new FormatPanel();
 
@@ -67,7 +67,7 @@ public class MainFrame extends JFrame {
 		add(toolBar, BorderLayout.NORTH);
 		add(controllPane, BorderLayout.EAST);
 		add(messagePane, BorderLayout.CENTER);
-		add(progressPane, BorderLayout.SOUTH);
+		// add(progressPane, BorderLayout.SOUTH);
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(400, 50, 750, 550);

@@ -52,6 +52,8 @@ public class MD5Controller {
 
 	private long TOTAL_BYTE;
 	private long ACTUAL_BYTE;
+	
+	private Charset cs;
 
 	private File file;
 
@@ -67,32 +69,39 @@ public class MD5Controller {
 	}
 
 	public static void main(String[] args) throws UnsupportedEncodingException {
+		MD5Controller a = new MD5Controller("D:\\Application Setup\\proplussp2013-kb2817430-fullfile-x64-zh-cn.exe");
+		System.out.println(a.doMD5());
+		System.out.println(a.getActual());
+		System.out.println(a.getTotal());
 	}
 
 	public MD5Controller(String path) {
-		this(new File(path));
+		this(path, Charset.defaultCharset());
+	}
+	public MD5Controller(String path, Charset cs) {
+		this(new File(path), Charset.defaultCharset());
+	}
+	
+	public MD5Controller(File file) {
+		this(file, Charset.defaultCharset());
 	}
 
-	public MD5Controller(File file) {
+	public MD5Controller(File file, Charset cs) {
 		this.file = file;
-		TOTAL_BYTE = -1L;
+		this.cs = cs;
+		TOTAL_BYTE = file.length();
 		ACTUAL_BYTE = 0L;
 	}
 
 	public void setFile(File file) {
 		this.file = file;
-		TOTAL_BYTE = -1L;
+		TOTAL_BYTE = file.length();
 		ACTUAL_BYTE = 0L;
 	}
 
 	@SuppressWarnings("unused")
 	private String doMD5(String message) throws UnsupportedEncodingException {
-		return doMD5(message, false, Charset.defaultCharset());
-	}
-
-	private String doMD5(String message, boolean isUpperCase)
-			throws UnsupportedEncodingException {
-		return doMD5(message, isUpperCase, Charset.defaultCharset());
+		return doMD5(message, false);
 	}
 
 	/**
@@ -107,7 +116,7 @@ public class MD5Controller {
 	 * @return
 	 * @throws UnsupportedEncodingException
 	 */
-	private String doMD5(String message, boolean isUpperCase, Charset cs)
+	private String doMD5(String message, boolean isUpperCase)
 			throws UnsupportedEncodingException {
 		byte[] dataArray = doComplement(message.getBytes(cs)); // (N + 1) * 512
 																// bit
@@ -129,32 +138,6 @@ public class MD5Controller {
 		return doMD5(false);
 	}
 
-	private long check() {
-		long length = 0;
-
-		length = file.length();
-		int r = (int) (length % 64);
-
-		long bitLength = r * 8;
-
-		int rVal = (int) (bitLength % 512);
-		if (bitLength == 448 || rVal != 448) {
-			// if bitLength == 448
-			// then comple 512 bit (64 byte)
-			int compleByte = (bitLength == 448) ? 64 : (448 - rVal) / 8;
-
-			// rVal > 448
-			if (compleByte < 0) {
-				compleByte += 64;
-			}
-
-			length += compleByte + 8;
-		}
-
-		return length;
-
-	}
-
 	/**
 	 * 对文件进行MD5运算，生成MD5值
 	 *
@@ -165,11 +148,13 @@ public class MD5Controller {
 	public String doMD5(boolean isUpperCase) {
 		FileInputStream in = null;
 		byte[] buffer = new byte[BUFFER_SIZE];
+		
+		long length = file.length();
+		boolean n512 = length % 64 == 0L;
 
 		long byteLength = 0;
 
 		hash = new long[] { CV_A, CV_B, CV_C, CV_D }; // Initialization
-		TOTAL_BYTE = check();
 		ACTUAL_BYTE = 0;
 
 		try {
@@ -178,7 +163,7 @@ public class MD5Controller {
 
 			// if empty file
 			// then return "d41d8cd98f00b204e9800998ecf8427e" directly
-			if (file.length() == 0L) {
+			if (length == 0L) {
 				return doMD5("", isUpperCase);
 			}
 
@@ -192,8 +177,15 @@ public class MD5Controller {
 
 				long[] M = doGetPacket(buffer, 0);
 				doMD5Round(M);
+				ACTUAL_BYTE += actualBytes;
+			}
+			
+			if (n512) {
+				byte[] b = doComplement("".getBytes(cs), length);
+				doMD5Round(doGetPacket(b, 0));
 				ACTUAL_BYTE += 64;
 			}
+			
 		} catch (Exception e) {
 			// There is a stub for Client class
 			e.printStackTrace();
