@@ -7,36 +7,28 @@ import java.awt.Font;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.UIManager;
 
+import org.gnull.controller.ToolBarController;
 import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
-import javax.swing.JProgressBar;
 
 public class MainFrame extends JFrame {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private JPanel messagePane;
-	private JPanel progressPane;
+	private MessagePanel messagePane;
+	private ProgressPanel progressPane;
 	private JPanel controllPane;
-	private JTabbedPane tabbedPane;
-	private JPanel panel;
-	private JPanel panel_1;
-	private JPanel panel_2;
-	private JTextField textField;
-	private JTextField textField_1;
-	private JLabel lblSad;
+	private ControllTabbedPanel ctrlTabPane;
 	private JToolBar toolBar;
 	private JButton btnBrowse;
 	private JButton btnClear;
 	private JButton btnExport;
 	private JButton btnStop;
-	private JProgressBar progressBar;
+	
+	private ToolBarController tbc = new ToolBarController();
 
 	/**
 	 * Launch the application.
@@ -60,7 +52,7 @@ public class MainFrame extends JFrame {
 	}
 
 	private void createMainPanel() {
-		controllPane = new JPanel();
+		controllPane = new JPanel(new BorderLayout(0, 0));
 		getContentPane().add(controllPane, BorderLayout.EAST);
 		
 		messagePane = new MessagePanel();
@@ -74,35 +66,11 @@ public class MainFrame extends JFrame {
 		getContentPane().add(controllPane, BorderLayout.EAST);
 		controllPane.setLayout(new BorderLayout(0, 0));
 		
-		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-		controllPane.add(tabbedPane);
+		ctrlTabPane = new ControllTabbedPanel();
+		controllPane.add(ctrlTabPane, BorderLayout.NORTH);
 		
-		panel = new JPanel();
-		tabbedPane.addTab("a", null, panel, null);
-		
-		progressBar = new JProgressBar();
-		panel.add(progressBar);
-		progressBar.setMinimum(0);
-		progressBar.setMaximum(100);
-		
-		
-		lblSad = new JLabel("sadsdadasdas");
-		panel.add(lblSad);
-		
-		textField_1 = new JTextField();
-		panel.add(textField_1);
-		textField_1.setColumns(10);
-		
-		panel_1 = new JPanel();
-		tabbedPane.addTab("b", null, panel_1, null);
-		
-		textField = new JTextField();
-		panel_1.add(textField);
-		textField.setColumns(10);
-		
-		panel_2 = new JPanel();
-		tabbedPane.addTab("c", null, panel_2, null);
+		FormatPanel p = new FormatPanel();
+		controllPane.add(p, BorderLayout.CENTER);
 		
 		toolBar = new JToolBar();
 		getContentPane().add(toolBar, BorderLayout.NORTH);
@@ -120,7 +88,7 @@ public class MainFrame extends JFrame {
 		toolBar.add(btnStop);
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(400, 200, 800, 400);
+		setBounds(400, 200, 600, 600);
 		setVisible(true);
 	}
 

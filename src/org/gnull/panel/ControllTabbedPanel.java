@@ -67,7 +67,7 @@ public class ControllTabbedPanel extends JPanel {
 		JFrame f = new JFrame();
 
 		f.getContentPane().add(new ControllTabbedPanel());
-		f.setSize(320, 230);
+		f.setSize(250, 220);
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.setLocationRelativeTo(null);
 		f.setVisible(true);
@@ -104,7 +104,7 @@ public class ControllTabbedPanel extends JPanel {
 
 	private void initContentPane() {
 		setLayout(new BorderLayout());
-		this.setSize(new Dimension(300, 240));
+		setPreferredSize(new Dimension(250, 220));
 
 		modeTabbedPane = new JTabbedPane(JTabbedPane.TOP);
 
@@ -148,7 +148,7 @@ public class ControllTabbedPanel extends JPanel {
 		encryptOptionPanel.add(p2, BorderLayout.CENTER);
 		encryptOptionPanel.add(p3, BorderLayout.SOUTH);
 		
-		modeTabbedPane.add("DES加密", encryptOptionPanel);
+		modeTabbedPane.add("加密", encryptOptionPanel);
 	}
 
 	private void createDecryptOptionPane() {
@@ -186,7 +186,7 @@ public class ControllTabbedPanel extends JPanel {
 		decryptOptionPanel.add(p2, BorderLayout.CENTER);
 		decryptOptionPanel.add(p3, BorderLayout.SOUTH);
 
-		modeTabbedPane.add("DES解密", decryptOptionPanel);
+		modeTabbedPane.add("解密", decryptOptionPanel);
 	}
 
 	private void createDigestOptionPane() {
