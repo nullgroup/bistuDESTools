@@ -161,6 +161,7 @@ public final class FontStyleController {
 	public static void setGlobalFont(Font font) {
 	    FontUIResource fontRes = new FontUIResource(font);
 	    Enumeration<Object> keys = UIManager.getDefaults().keys();
+	    
 	    while (keys.hasMoreElements()) {
 	        Object key = keys.nextElement();
 	        Object value = UIManager.get(key);

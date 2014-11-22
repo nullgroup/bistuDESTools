@@ -33,9 +33,9 @@ public class FileIOController {
 
 		if (file.isFile()) {
 			String parent = file.getParent();
-			file = new File(parent + File.pathSeparator + filename);
+			file = new File(parent + File.separator + filename);
 		} else {
-			file = new File(file.getAbsolutePath() + filename);
+			file = new File(file.getAbsolutePath()+ File.separator + filename);
 		}
 
 		export(text, file);

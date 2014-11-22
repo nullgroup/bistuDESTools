@@ -98,10 +98,10 @@ public class ControllTabbedPanel extends JPanel {
 
 	public ControllTabbedPanel() {
 		setLookAndFeel();
-		initContentPane();
+		createContentPane();
 	}
 
-	private void initContentPane() {
+	private void createContentPane() {
 		setLayout(new BorderLayout());
 		setPreferredSize(new Dimension(250, 220));
 
@@ -270,6 +270,7 @@ public class ControllTabbedPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser fileChooser = new JFileChooser();
 				fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				
 				int i = fileChooser.showOpenDialog(fileChooser);
 				if (i == JFileChooser.APPROVE_OPTION) {
 					String selectedFilepath = fileChooser.getSelectedFile()

@@ -42,7 +42,7 @@ public final class ProgressPanelController {
 		progresslistener = new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				final File file = new File("D:\\桌面杂项\\支教\\P1010432.jpg");
+				final File file = new File("D:\\Application Setup\\cn_sql_server_2014_express_x64_exe_3949524.exe");
 				md5 = new MD5Controller(file);
 				
 				Md5thread = new Thread() {
@@ -75,7 +75,7 @@ public final class ProgressPanelController {
 						packet.setLastModified(new Date());
 						packet.setMd5Value(Md5Value);
 						System.out.println(packet.toString());
-						mp.getMessagePanelController().insert(packet.toString());
+						mp.getController().insert(packet.toString());
 						
 						
 						

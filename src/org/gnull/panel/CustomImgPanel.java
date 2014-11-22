@@ -19,6 +19,10 @@ import com.sun.awt.AWTUtilities;
  * @author waitatlee@163.com
  */
 public class CustomImgPanel extends JPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private int width = 0;
 	private int height = 0;
 	private String imgPath = "";

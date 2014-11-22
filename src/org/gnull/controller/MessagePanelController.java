@@ -1,10 +1,16 @@
 package org.gnull.controller;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -122,5 +128,31 @@ public final class MessagePanelController {
 		} catch (BadLocationException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public Action createTextComponentAction() {
+		final JPopupMenu menu = textPane.getComponentPopupMenu();
+		Action a = new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JTextComponent tc = (JTextComponent) menu.getInvoker();
+				JMenuItem item = (JMenuItem) e.getSource();
+				String acc = item.getAccessibleContext().getAccessibleDescription();
+				
+				if (acc.equals("Copy")) {
+					tc.copy();
+				} else if (acc.equals("Select.All")) {
+					tc.selectAll();
+				} else if (acc.equals("Search")) {
+					// search dialog
+				}
+			}
+			
+		};
+		
+		return a;
 	}
 }

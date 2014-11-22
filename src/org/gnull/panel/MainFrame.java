@@ -3,13 +3,16 @@ package org.gnull.panel;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -18,6 +21,8 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
 import org.gnull.controller.FontStyleController;
+import org.gnull.controller.MainFrameController;
+import org.gnull.controller.MessagePanelController;
 import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
 
 public class MainFrame extends JFrame {
@@ -27,11 +32,13 @@ public class MainFrame extends JFrame {
 	private MessagePanel messagePane;
 	private ProgressPanel progressPane;
 	private JPanel controllPane;
-	private ControllTabbedPanel ctrlTabPane;
-	private FormatPanel forPanel;
 	private JToolBar toolBar;
 	
-	private Thread threadListen;
+	private MainFrameController controller;
+
+	public MainFrameController getController() {
+		return controller;
+	}
 
 	/**
 	 * Launch the application.
@@ -52,39 +59,40 @@ public class MainFrame extends JFrame {
 	public MainFrame() {
 		setLookAndFeel();
 		createMainPanel();
-		
 	}
 
 	private void createMainPanel() {
+		controller = new MainFrameController();
+		
 		JMenuBar bar = createMenuBar("工具栏");
 		toolBar = createToolBar("MainWindow.ToolBar", JToolBar.HORIZONTAL, false);
-		controllPane = new JPanel(new BorderLayout(0, 0));
+		controllPane = new ControllPanel();
 		messagePane = new MessagePanel();
 		progressPane = new ProgressPanel(messagePane);
-		ctrlTabPane = new ControllTabbedPanel();
-		forPanel = new FormatPanel();
 
 		setJMenuBar(bar);
-		controllPane.add(ctrlTabPane, BorderLayout.NORTH);
-		controllPane.add(forPanel, BorderLayout.CENTER);
 		add(toolBar, BorderLayout.NORTH);
 		add(controllPane, BorderLayout.EAST);
 		add(messagePane, BorderLayout.CENTER);
 		add(progressPane, BorderLayout.SOUTH);
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(400, 50, 750, 550);
+		setBounds(400, 50, 750, 580);
 		setVisible(true);
 	}
 
 	public static void setLookAndFeel() {
 		try {
+			// Set Graphics UI
 			BeautyEyeLNFHelper.frameBorderStyle = BeautyEyeLNFHelper.FrameBorderStyle.osLookAndFeelDecorated;
 			BeautyEyeLNFHelper.launchBeautyEyeLNF();
-			FontStyleController.setGlobalFont(new Font("微软雅黑", Font.PLAIN, 12));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+		// Set Global Font
+		Font globalFont = new Font("微软雅黑", Font.PLAIN, 12);
+		FontStyleController.setGlobalFont(globalFont);
 	}
 
 	private JMenuBar createMenuBar(String accessibleName) {
@@ -120,6 +128,7 @@ public class MainFrame extends JFrame {
 		mi.getAccessibleContext().setAccessibleDescription(
 				accessibleDescription);
 		mi.addActionListener(action);
+		
 		return mi;
 	}
 
@@ -129,14 +138,14 @@ public class MainFrame extends JFrame {
 		bar.getAccessibleContext().setAccessibleName("工具栏");
 
 		createToolBarButton(bar, null, new ImageIcon("res/browse/browse.png"),
-				"浏览", null);
+				"浏览", createBrowseAction());
 		createToolBarButton(bar, null, new ImageIcon("res/clear/clear.png"),
-				"清空", null);
+				"清空", createClearAction());
 		createToolBarButton(bar, null, new ImageIcon("res/export/export.png"),
-				"导出", null);
+				"导出", createExportAction());
 		bar.addSeparator();
 		createToolBarButton(bar, null, new ImageIcon("res/stop/stop.png"),
-				"停止", null);
+				"停止", createStopAction());
 		bar.addSeparator();
 
 		return bar;
@@ -148,10 +157,98 @@ public class MainFrame extends JFrame {
 
 		btn.setText(text);
 		btn.setIcon(icon);
+		btn.setToolTipText(accessibleDescription);
 		btn.getAccessibleContext().setAccessibleDescription(
 				accessibleDescription);
 
 		return btn;
 	}
+	
+	private Action createBrowseAction() {
+		Action a = new AbstractAction() {
 
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser fileChooser = new JFileChooser();
+				@SuppressWarnings("unused")
+				String selectedFilepath = null;	
+				fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+				fileChooser.setDialogTitle("选择目标文件(文件夹)");
+				
+				int i = fileChooser.showOpenDialog(fileChooser);
+				if (i == JFileChooser.APPROVE_OPTION) {
+					selectedFilepath = fileChooser.getSelectedFile()
+							.getAbsolutePath();
+				} else {
+					return;
+				}
+				
+				System.out.println(((ControllPanel) controllPane).getController().getArguments().toString());
+			}
+		};
+		
+		return a;
+	}
+
+	private Action createClearAction() {
+		Action a = new AbstractAction() {
+			
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				MessagePanelController mpc = messagePane.getController();
+				mpc.clear();
+			}
+		};
+		
+		return a;
+	}
+	
+	private Action createExportAction() {
+		Action a = new AbstractAction() {
+			
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser fileChooser = new JFileChooser();
+				String selectedFilepath = null;	
+				fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				fileChooser.setDialogTitle("导出");
+				
+				int i = fileChooser.showOpenDialog(fileChooser);
+				if (i == JFileChooser.APPROVE_OPTION) {
+					selectedFilepath = fileChooser.getSelectedFile()
+							.getAbsolutePath();
+				} else {
+					return;
+				}
+
+				MessagePanelController mpc = messagePane.getController();	
+				if (selectedFilepath != null) {
+					mpc.export(selectedFilepath);
+				}
+			}		
+		};
+		
+		return a;
+	}
+	
+	private Action createStopAction() {
+		Action a = new AbstractAction() {
+			
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// Stop the proceed
+			}
+			
+		};
+		
+		return a;
+	}
 }
