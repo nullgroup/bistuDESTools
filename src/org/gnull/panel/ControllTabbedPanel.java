@@ -2,7 +2,6 @@ package org.gnull.panel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -20,9 +19,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
-import org.gnull.controller.FontStyleController;
 import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
-import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper.FrameBorderStyle;
 
 public class ControllTabbedPanel extends JPanel {
 
@@ -63,9 +60,11 @@ public class ControllTabbedPanel extends JPanel {
 		return deOutputPath;
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		JFrame f = new JFrame();
 
+		BeautyEyeLNFHelper.frameBorderStyle = BeautyEyeLNFHelper.FrameBorderStyle.osLookAndFeelDecorated;
+		BeautyEyeLNFHelper.launchBeautyEyeLNF();
 		f.getContentPane().add(new ControllTabbedPanel());
 		f.setSize(250, 220);
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -219,14 +218,6 @@ public class ControllTabbedPanel extends JPanel {
 	}
 
 	private void setLookAndFeel() {
-		BeautyEyeLNFHelper.frameBorderStyle = FrameBorderStyle.osLookAndFeelDecorated;
-		try {
-			BeautyEyeLNFHelper.launchBeautyEyeLNF();
-		} catch (Exception e) {
-			System.out.println("Can't not setGraphicUI (at "
-					+ this.getClass().getName() + "): " + e.getMessage());
-		}
-		FontStyleController.setGlobalFont(new Font("Î¢ÈíÑÅºÚ", Font.PLAIN, 12));
 		TitledBorder border = new TitledBorder(null, "Ä£Ê½Ñ¡Ôñ",
 				TitledBorder.LEADING, TitledBorder.TOP, null, null);
 		setBorder(border);
