@@ -59,6 +59,10 @@ public class ControllTabbedPanel extends JPanel {
 	public JTextField getDeOutputPath() {
 		return deOutputPath;
 	}
+	
+	public JTextField getHashField() {
+		return hashField;
+	}
 
 	public static void main(String[] args) throws Exception {
 		JFrame f = new JFrame();
@@ -134,7 +138,7 @@ public class ControllTabbedPanel extends JPanel {
 		enOutputPath.setAutoscrolls(false);
 		enOutputPath.setPreferredSize(new Dimension(140, 30));
 		JButton btnSelectFileA = createSelectFileButton(ENCRYPT);
-		btnSelectFileA.setText("浏览文件");
+		btnSelectFileA.setText("输出路径");
 		btnSelectFileA.setPreferredSize(new Dimension(80, 30));
 
 		p1.add(keyValA, BorderLayout.WEST);

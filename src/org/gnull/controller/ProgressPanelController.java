@@ -1,114 +1,127 @@
 package org.gnull.controller;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.Toolkit;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.Date;
 
-import javax.swing.JButton;
-import javax.swing.JProgressBar;
-import javax.swing.Timer;
+import javax.swing.SwingWorker;
 
+import org.gnull.entity.MessagePacket;
 import org.gnull.md5.MD5Controller;
-import org.gnull.message.MessagePacket;
-import org.gnull.panel.MessagePanel;
+import org.gnull.panel.ProgressPanel;
 
-public final class ProgressPanelController {
-	
-	private JProgressBar jprogressbar;
-	private JButton jbutton;
-	private ActionListener progresslistener;
-	private ActionListener timerlistener;
-	private MD5Controller md5;
-	private double md5byte;
-	private double md5currentbyte;
-	private int progress;
-	private boolean endflag = false;
-	private String Md5Value;
-	
-	private Thread Md5thread ;
-	private Thread Md5Listener;
-	
-	private MessagePanel mp;
-	
+public final class ProgressPanelController implements PropertyChangeListener {
+
+	private MD5Controller md5Con;
+
+	private ComputeTask computeTask;
+	private ListenTask listenTask;
+
+	private ProgressPanel panel;
+
 	private MessagePacket packet = new MessagePacket();
-	
-	public ProgressPanelController(JProgressBar progressbar, JButton button, MessagePanel messagepanel) {
-		
-		setMessagePanel(messagepanel);
-		setJProgressBar(progressbar);
-		setJButton(button);
-		
-		progresslistener = new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
-				final File file = new File("D:\\Application Setup\\cn_sql_server_2014_express_x64_exe_3949524.exe");
-				md5 = new MD5Controller(file);
-				
-				Md5thread = new Thread() {
-					public void run() {
-						System.out.println("Md5 Start!");
-						Md5Value = md5.doMD5();
-						System.out.println(Md5Value);
-						System.out.println("Md5 Complete!");
-					}
-				};
-				
-				Md5Listener = new Thread() {
-					public void run() {
-						System.out.println("Md5Listen Start!");
-						while (true) {
-							System.out.println(md5.getTotal()+ "," + md5.getActual());
-							if (md5byte == -1) continue;
-							progress = (int) (((double) md5.getActual() / md5.getTotal()) * 100);
-							jbutton.setEnabled(false);
-							jprogressbar.setValue(progress);
-							if (Math.abs(md5.getTotal() - md5.getActual()) <= 64) break;
-						}
-						jbutton.setEnabled(true);
-						System.out.println("Md5Listen Complete!");
-						
-						packet.setMode("ժҪ");
-						packet.setDate(new Date());
-						packet.setFileName(file.getName());
-						packet.setSize(file.length());
-						packet.setLastModified(new Date());
-						packet.setMd5Value(Md5Value);
-						System.out.println(packet.toString());
-						mp.getController().insert(packet.toString());
-						
-						
-						
-					}
-				};
-				
-				Md5Listener.start();
-				Md5thread.start();
+
+	public ProgressPanelController(ProgressPanel panel) {
+
+		this.panel = panel;
+	}
+
+	class ComputeTask extends SwingWorker<Void, Void> {
+
+		private String result;
+
+		public ComputeTask(int mode, String[] params) {
+
+		}
+
+		/*
+		 * Main task. Executed in background thread.
+		 */
+		@Override
+		public Void doInBackground() {
+			File inputFile = new File("D:\\Application Setup\\cn_sql_server_2014_express_x64_exe_3949524.exe");
+			
+			if (!inputFile.exists()) {
+				return null;
 			}
 			
-		};
-		
-		button.addActionListener(progresslistener);
+			md5Con = new MD5Controller(inputFile);
+
+			System.out.println("Md5 Start!");
+			result = md5Con.doMD5();
+
+			return null;
+		}
+
+		/*
+		 * Executed in event dispatching thread
+		 */
+		@Override
+		public void done() {
+			System.out.println("Md5 Complete: " + result);
+		}
 	}
-	
-	private void setJProgressBar(JProgressBar jpb) {
-		this.jprogressbar = jpb;
+
+	class ListenTask extends SwingWorker<Void, Void> {
+		/*
+		 * Main task. Executed in background thread.
+		 */
+		@Override
+		public Void doInBackground() {
+			int progress = 0;
+			setProgress(0);
+
+			panel.startButton.setEnabled(false);
+
+			System.out.println("Md5Listen Start!");
+			
+			while (true) {
+				System.out.println(md5Con.getTotal() + "," + md5Con.getActual());
+				
+				if (md5Con.getTotal() == -1) {
+					continue;
+				}
+				
+				progress = (int) (((double) md5Con.getActual() / md5Con.getTotal()) * 100);
+				
+				setProgress(progress);
+				
+				if (md5Con.getTotal() == md5Con.getActual()) {
+					break;
+				}
+			}
+			return null;
+		}
+
+		/*
+		 * Executed in event dispatching thread
+		 */
+		@Override
+		public void done() {
+			System.out.println("Md5Listen Complete!");
+			Toolkit.getDefaultToolkit().beep();
+			panel.startButton.setEnabled(true);
+			panel.setCursor(null);
+			panel.messagePane.getController().insert(packet.toString());
+		}
 	}
-	
-	private void setJButton(JButton btn) {
-		this.jbutton = btn;
+
+	public void compute() {
+		computeTask = new ComputeTask(0, null);
+		listenTask = new ListenTask();
+		listenTask.addPropertyChangeListener(this);
+
+		computeTask.execute();
+		listenTask.execute();
 	}
-	
-	public void setMessagePanel(MessagePanel messagepanel) {
-		mp = messagepanel;
-	}
-	
-	public JProgressBar getJProgressBar() {
-		return jprogressbar;
-	}
-	
-	public MessagePacket getMessagePacket() {
-		return packet;
+
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		if ("progress".equals(evt.getPropertyName())) {
+			int i = (int) evt.getNewValue();
+			panel.progressbar.setValue(i);
+		}
 	}
 
 }

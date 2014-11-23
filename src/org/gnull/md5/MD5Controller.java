@@ -150,11 +150,12 @@ public class MD5Controller {
 		byte[] buffer = new byte[BUFFER_SIZE];
 		
 		long length = file.length();
-		boolean n512 = length % 64 == 0L;
+		boolean n512 = (length % 64 == 0L);
 
 		long byteLength = 0;
 
 		hash = new long[] { CV_A, CV_B, CV_C, CV_D }; // Initialization
+		TOTAL_BYTE = check(length, n512);
 		ACTUAL_BYTE = 0;
 
 		try {
@@ -177,7 +178,7 @@ public class MD5Controller {
 
 				long[] M = doGetPacket(buffer, 0);
 				doMD5Round(M);
-				ACTUAL_BYTE += actualBytes;
+				ACTUAL_BYTE += 64;
 			}
 			
 			if (n512) {
@@ -199,6 +200,36 @@ public class MD5Controller {
 
 		String md5 = doGetMD5String(hash, isUpperCase);
 		return md5;
+	}
+
+	private long check(long length, boolean n512) {
+		long total = 0;
+		if (length == 0) {
+			total = 0;
+		} else if(n512) {
+			total = length + 64;
+		} else {
+			long bitLength = length * 8;
+
+			int rVal = (int) (bitLength % 512);
+			if (bitLength == 448 || rVal != 448) {
+				// if bitLength == 448
+				// then comple 512 bit (64 byte)
+				int compleByte = (bitLength == 448) ? 64 : (448 - rVal) / 8;
+
+				// rVal > 448
+				if (compleByte < 0) {
+					compleByte += 64;
+				}
+				
+				length += compleByte;
+			}
+			
+			length += 8;
+			total = length;
+		}
+		
+		return total;
 	}
 
 	/**

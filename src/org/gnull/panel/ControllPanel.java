@@ -25,19 +25,15 @@ public class ControllPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private ControllTabbedPanel tabPane;
+	public ControllTabbedPanel tabPane;
 
-	private JButton btnStart;
+	public JButton btnStart;
 
-	private Vector<JCheckBox> checkbox = new Vector<JCheckBox>();
+	public Vector<JCheckBox> checkbox = new Vector<JCheckBox>();
 
-	private ItemListener changeState;
+	public ItemListener changeState;
 
 	private ControllPanelController controller;
-
-	public Vector<JCheckBox> getCheckBoxVector() {
-		return checkbox;
-	}
 
 	public ControllPanelController getController() {
 		return controller;
@@ -63,10 +59,9 @@ public class ControllPanel extends JPanel {
 
 		JPanel bottomPane = new JPanel(new GridLayout(6, 2, 0, 0));
 		bottomPane.setBorder(createBorder("参数选择"));
-
-		controller = new ControllPanelController(this);
-
+		
 		tabPane = new ControllTabbedPanel();
+		controller = new ControllPanelController(this);
 
 		changeState = createChangeStateListener();
 
@@ -88,13 +83,14 @@ public class ControllPanel extends JPanel {
 		JCheckBox cbStub = createArgumentCheckBox("Stub", "ControllPanel.Stub",
 				"生成目标文件的Stub值", KeyEvent.VK_A, changeState);
 
-		btnStart = createBrowseFileButton("浏览文件");
+		btnStart = createBrowseFileButton("浏览文件", "ControllPanel.Select.InputFile");
 
 		checkbox.add((JCheckBox) bottomPane.add(cbProMode));
 		checkbox.add((JCheckBox) bottomPane.add(cbMd5));
 		checkbox.add((JCheckBox) bottomPane.add(cbSha1));
 		checkbox.add((JCheckBox) bottomPane.add(cbCrc32));
 		checkbox.add((JCheckBox) bottomPane.add(cbStub));
+		
 		bottomPane.add(btnStart);
 
 		add(tabPane, BorderLayout.CENTER);
@@ -118,8 +114,8 @@ public class ControllPanel extends JPanel {
 
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				ControllPanelController cpc = getController();
-				ArgumentsSet set = cpc.getArguments();
+				ControllPanelController controller = getController();
+				ArgumentsSet set = controller.getArguments();
 				
 				JCheckBox box = (JCheckBox) e.getSource();
 				String actionCommand = box.getActionCommand();
@@ -141,16 +137,18 @@ public class ControllPanel extends JPanel {
 	}
 
 	private Border createBorder(String title) {
-		TitledBorder border = new TitledBorder(null, "参数选择",
+		TitledBorder border = new TitledBorder(null, title,
 				TitledBorder.LEADING, TitledBorder.TOP, null, null);
 
 		return border;
 	}
 
-	private JButton createBrowseFileButton(String text) {
+	private JButton createBrowseFileButton(String text, String accessibleName) {
 		JButton button = new JButton();
 
-		button.setAction(createBrowseAction());
+		Action a = createBrowseAction();
+		button.setAction(a);
+		button.getAccessibleContext().setAccessibleName(accessibleName);
 		button.setText(text);
 
 		return button;

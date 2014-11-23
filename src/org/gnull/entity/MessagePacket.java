@@ -1,4 +1,4 @@
-package org.gnull.message;
+package org.gnull.entity;
 
 import java.util.Date;
 
@@ -136,7 +136,7 @@ public class MessagePacket {
 		builder.append("\n文件: ");
 		builder.append(fileName);
 		builder.append("\n大小: ");
-		builder.append(size);
+		builder.append(size + "字节");
 		builder.append("\n修改时间: ");
 		builder.append(lastModified);
 		

@@ -1,12 +1,9 @@
 package org.gnull.controller;
 
 import java.awt.Color;
-import java.awt.event.ActionEvent;
+import java.util.HashMap;
 
-import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -16,29 +13,30 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-import org.gnull.message.MessagePacket;
+import org.gnull.entity.MessagePacket;
+import org.gnull.panel.MessagePanel;
 import org.gnull.util.FileIOController;
 
 public final class MessagePanelController {
 
-	private FileIOController io;
+	private FileIOController ioController;
+	
+	private HashMap<Object, Action> actionsMap;
+	
 	private JTextPane textPane;
 
 	public JTextPane getTextPane() {
 		return textPane;
 	}
 
-	public void setTextPane(JTextPane textPane) {
-		this.textPane = textPane;
-	}
-
 	public MessagePanelController() {
 		this(null);
 	}
 
-	public MessagePanelController(JTextPane textPane) {
-		io = new FileIOController();
-		this.textPane = textPane;
+	public MessagePanelController(MessagePanel msgPane) {
+		textPane = msgPane.messagePane;
+		actionsMap = createActionTable(textPane);
+		ioController = new FileIOController();
 	}
 
 	/**
@@ -48,12 +46,16 @@ public final class MessagePanelController {
 	 */
 	public void export(String dstPath) {
 		if (textPane != null) {
-			Document doc = textPane.getDocument();
+			Document document = textPane.getDocument();
+			
+			String outputMessage = "";
 			try {
-				io.exportTextToFile(doc.getText(0, doc.getLength()), dstPath);
+				outputMessage = document.getText(0, document.getLength());
 			} catch (BadLocationException e) {
-				e.printStackTrace();
+				System.out.println("Location Bad At Export: " + e.getMessage());
 			}
+
+			ioController.exportTextToFile(outputMessage, dstPath);
 		}
 	}
 
@@ -62,12 +64,12 @@ public final class MessagePanelController {
 	 */
 	public void clear() {
 		if (textPane != null) {
-			Document doc = textPane.getDocument();
+			Document document = textPane.getDocument();
 
 			try {
-				doc.remove(0, doc.getLength());
+				document.remove(0, document.getLength());
 			} catch (BadLocationException e) {
-				e.printStackTrace();
+				System.out.println("Location Bad At Clear: " + e.getMessage());
 			}
 		}
 	}
@@ -129,30 +131,20 @@ public final class MessagePanelController {
 			e.printStackTrace();
 		}
 	}
-	
-	public Action createTextComponentAction() {
-		final JPopupMenu menu = textPane.getComponentPopupMenu();
-		Action a = new AbstractAction() {
 
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JTextComponent tc = (JTextComponent) menu.getInvoker();
-				JMenuItem item = (JMenuItem) e.getSource();
-				String acc = item.getAccessibleContext().getAccessibleDescription();
-				
-				if (acc.equals("Copy")) {
-					tc.copy();
-				} else if (acc.equals("Select.All")) {
-					tc.selectAll();
-				} else if (acc.equals("Search")) {
-					// search dialog
-				}
-			}
-			
-		};
+	private HashMap<Object, Action> createActionTable(
+			JTextComponent textComponent) {
+		HashMap<Object, Action> actions = new HashMap<Object, Action>();
+		Action[] actionsArray = textComponent.getActions();
 		
-		return a;
+		for (int i = 0; i < actionsArray.length; i++) {
+			Action a = actionsArray[i];
+			actions.put(a.getValue(Action.NAME), a);
+		}
+		return actions;
+	}
+	
+	public Action getActionByName(String name) {
+	    return actionsMap.get(name);
 	}
 }

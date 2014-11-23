@@ -4,7 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
-import javax.swing.Action;
+import javax.accessibility.AccessibleContext;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
@@ -13,7 +13,9 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
+import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.Document;
 
 import org.gnull.controller.MessagePanelController;
 
@@ -21,15 +23,12 @@ public class MessagePanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private JTextPane msgTextPane;
-	private MessagePanelController mpc;
-
-	public JTextPane getTextPane() {
-		return msgTextPane;
-	}
+	private MessagePanelController controller;
+	
+	public JTextPane messagePane;
 
 	public MessagePanelController getController() {
-		return mpc;
+		return controller;
 	}
 
 	public static void main(String[] args) {
@@ -49,53 +48,64 @@ public class MessagePanel extends JPanel {
 	}
 
 	private void addTestMessage() {
-		mpc.insert("测试文本abcdefghijklmnopqrstuvwxyz");
+		controller.insert("测试文本abcdefghijklmnopqrstuvwxyz");
 	}
 
 	public void createMessagePanel() {
 		setLayout(new BorderLayout(0, 0));
 		setAlignmentX(LEFT_ALIGNMENT);
 
-		msgTextPane = new JTextPane();
-		msgTextPane.setEditable(false);
-		msgTextPane.setDocument(new DefaultStyledDocument());
+		Document document = new DefaultStyledDocument();
+		messagePane = createMessagePane(false, document);
 
-		mpc = new MessagePanelController(msgTextPane);
+		controller = new MessagePanelController(this);
 
-		JPopupMenu popMenu = createPopupMenu("消息面板弹出菜单");
+		JPopupMenu popMenu = createPopupMenu("消息面板弹出菜单", "MessagePanel.PopupMenu");
+		messagePane.setComponentPopupMenu(popMenu);
 
-		msgTextPane.setComponentPopupMenu(popMenu);
-		add(new JScrollPane(msgTextPane), BorderLayout.CENTER);
+		add(new JScrollPane(messagePane), BorderLayout.CENTER);
 	}
 
-	private JPopupMenu createPopupMenu(String accessibleName) {
-		JPopupMenu menu = new JPopupMenu();
-		menu.getAccessibleContext().setAccessibleName(accessibleName);
+	private JTextPane createMessagePane(boolean editable, Document document) {
+		JTextPane pane = new JTextPane();
 
-		Action textComponentAction = mpc.createTextComponentAction();
+		pane.setEditable(editable);
+		pane.setDocument(document);
 
-		createPopupMenuItem(menu, "复制", "Copy",
-				KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK),
-				textComponentAction);
-		createPopupMenuItem(menu, "全选", "Select.All",
-				KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK),
-				textComponentAction);
+		return pane;
+	}
+
+	private JPopupMenu createPopupMenu(String name, String accessibleName) {
+		JPopupMenu menu = new JPopupMenu(name);
+		AccessibleContext context = menu.getAccessibleContext();
+		context.setAccessibleName(accessibleName);
+
+		KeyStroke keyCopy = KeyStroke.getKeyStroke(KeyEvent.VK_C,
+				ActionEvent.CTRL_MASK);
+		KeyStroke keySelectAll = KeyStroke.getKeyStroke(KeyEvent.VK_A,
+				ActionEvent.CTRL_MASK);
+		KeyStroke keySearch = KeyStroke.getKeyStroke(KeyEvent.VK_F,
+				ActionEvent.CTRL_MASK);
+
+		createPopupMenuItem(menu, "复制", "Copy", keyCopy,
+				DefaultEditorKit.copyAction);
+		createPopupMenuItem(menu, "全选", "Select.All", keySelectAll,
+				DefaultEditorKit.selectAllAction);
 		menu.addSeparator();
-		createPopupMenuItem(menu, "查找", "Search",
-				KeyStroke.getKeyStroke(KeyEvent.VK_F, ActionEvent.CTRL_MASK),
-				textComponentAction);
+		createPopupMenuItem(menu, "查找", "Search", keySearch, null);
 
 		return menu;
 	}
 
 	private JMenuItem createPopupMenuItem(JPopupMenu menu, String label,
-			String accessibleDescription, KeyStroke ks, Action action) {
+			String accessibleDescription, KeyStroke keyStroke, String action) {
 		JMenuItem mi = (JMenuItem) menu.add(new JMenuItem(label));
 
 		mi.setBorder(BorderFactory.createEmptyBorder());
 		mi.getAccessibleContext().setAccessibleDescription(
 				accessibleDescription);
-		mi.addActionListener(action);
+		mi.setAccelerator(keyStroke);
+		mi.addActionListener(controller.getActionByName(action));
 
 		return mi;
 	}

@@ -17,7 +17,6 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
 import org.gnull.controller.FontStyleController;
@@ -29,10 +28,10 @@ public class MainFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 
-	private MessagePanel messagePane;
-	private ProgressPanel progressPane;
-	private JPanel controllPane;
-	private JToolBar toolBar;
+	public MessagePanel messagePane;
+	public ProgressPanel progressPane;
+	public ControllPanel controllPane;
+	public JToolBar toolBar;
 	
 	private MainFrameController controller;
 
@@ -64,13 +63,14 @@ public class MainFrame extends JFrame {
 	private void createMainPanel() {
 		controller = new MainFrameController();
 		
-		JMenuBar bar = createMenuBar("工具栏");
-		toolBar = createToolBar("MainWindow.ToolBar", JToolBar.HORIZONTAL, false);
-		controllPane = new ControllPanel();
-		messagePane = new MessagePanel();
-		progressPane = new ProgressPanel(messagePane);
-
+		JMenuBar bar = createMenuBar("MainFrame.MenuBar");
 		setJMenuBar(bar);
+		
+		toolBar = createToolBar("工具栏", "MainFrame.ToolBar", JToolBar.HORIZONTAL, false);
+		controllPane = new ControllPanel();
+		progressPane = new ProgressPanel();
+		messagePane = progressPane.messagePane;
+
 		add(toolBar, BorderLayout.NORTH);
 		add(controllPane, BorderLayout.EAST);
 		add(messagePane, BorderLayout.CENTER);
@@ -132,17 +132,20 @@ public class MainFrame extends JFrame {
 		return mi;
 	}
 
-	private JToolBar createToolBar(String name, int orientation, boolean isFloatable) {
+	private JToolBar createToolBar(String name, String accessiblename, int orientation, boolean isFloatable) {
 		JToolBar bar = new JToolBar(name, orientation);
 		bar.setFloatable(isFloatable);
-		bar.getAccessibleContext().setAccessibleName("工具栏");
+		bar.getAccessibleContext().setAccessibleName(accessiblename);
 
 		createToolBarButton(bar, null, new ImageIcon("res/browse/browse.png"),
 				"浏览", createBrowseAction());
+		
 		createToolBarButton(bar, null, new ImageIcon("res/clear/clear.png"),
 				"清空", createClearAction());
+		
 		createToolBarButton(bar, null, new ImageIcon("res/export/export.png"),
 				"导出", createExportAction());
+		
 		bar.addSeparator();
 		createToolBarButton(bar, null, new ImageIcon("res/stop/stop.png"),
 				"停止", createStopAction());
@@ -215,21 +218,21 @@ public class MainFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser fileChooser = new JFileChooser();
-				String selectedFilepath = null;	
+				String selectedFilePath = null;	
 				fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				fileChooser.setDialogTitle("导出");
 				
 				int i = fileChooser.showOpenDialog(fileChooser);
 				if (i == JFileChooser.APPROVE_OPTION) {
-					selectedFilepath = fileChooser.getSelectedFile()
+					selectedFilePath = fileChooser.getSelectedFile()
 							.getAbsolutePath();
 				} else {
 					return;
 				}
 
 				MessagePanelController mpc = messagePane.getController();	
-				if (selectedFilepath != null) {
-					mpc.export(selectedFilepath);
+				if (selectedFilePath != null) {
+					mpc.export(selectedFilePath);
 				}
 			}		
 		};

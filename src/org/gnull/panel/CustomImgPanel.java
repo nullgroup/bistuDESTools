@@ -81,7 +81,7 @@ public class CustomImgPanel extends JPanel {
 		f.getRootPane().setWindowDecorationStyle(JRootPane.NONE);
 		f.setVisible(true);
 		
-		Thread.sleep(1000);
+		Thread.sleep(4000);
 		
 		f.dispose();
 		
