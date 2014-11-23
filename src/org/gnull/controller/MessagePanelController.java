@@ -17,6 +17,10 @@ import org.gnull.entity.MessagePacket;
 import org.gnull.panel.MessagePanel;
 import org.gnull.util.FileIOController;
 
+/**
+ * @author OSX
+ *
+ */
 public final class MessagePanelController {
 
 	private FileIOController ioController;
@@ -33,6 +37,9 @@ public final class MessagePanelController {
 		this(null);
 	}
 
+	/**
+	 * @param msgPane
+	 */
 	public MessagePanelController(MessagePanel msgPane) {
 		textPane = msgPane.messagePane;
 		actionsMap = createActionTable(textPane);
@@ -93,7 +100,7 @@ public final class MessagePanelController {
 			try {
 				doc.insertString(doc.getLength(), text, attr);
 			} catch (BadLocationException e) {
-				e.printStackTrace();
+				System.out.println("Location Bad At Insert: " + e.getMessage());
 			}
 		}
 	}

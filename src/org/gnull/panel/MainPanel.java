@@ -24,7 +24,7 @@ import org.gnull.controller.MainFrameController;
 import org.gnull.controller.MessagePanelController;
 import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
 
-public class MainFrame extends JFrame {
+public class MainPanel extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 
@@ -46,7 +46,7 @@ public class MainFrame extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					MainFrame frame = new MainFrame();
+					MainPanel frame = new MainPanel();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -55,7 +55,7 @@ public class MainFrame extends JFrame {
 		});
 	}
 
-	public MainFrame() {
+	public MainPanel() {
 		setLookAndFeel();
 		createMainPanel();
 	}

@@ -24,7 +24,7 @@ public final class ProgressPanelController implements PropertyChangeListener {
 
 	public void compute() {
 		if (computeTask != null && listenTask != null) {
-			computeTask = new ComputeTask(0, null);
+			computeTask = new ComputeTask(null, 0, 0, null);
 			listenTask = new ListenTask();
 			listenTask.addPropertyChangeListener(this);
 
@@ -37,7 +37,7 @@ public final class ProgressPanelController implements PropertyChangeListener {
 	public void propertyChange(PropertyChangeEvent evt) {
 		if ("progress".equals(evt.getPropertyName())) {
 			int i = (int) evt.getNewValue();
-			panel.progressbar.setValue(i);
+			panel.progressBar.setValue(i);
 		}
 	}
 

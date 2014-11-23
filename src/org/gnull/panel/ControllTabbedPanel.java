@@ -21,45 +21,54 @@ import javax.swing.border.TitledBorder;
 
 import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
 
+/**
+ * @author OSX
+ *
+ */
 public class ControllTabbedPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
 	static public final int ENCRYPT = 0xCDC;
+
 	static public final int DECRYPT = 0xDCD;
 
-	private JPanel encryptOptionPanel;
-	private JPanel decryptOptionPanel;
+	private JPanel enPane;
+
+	private JPanel dePane;
+
 	private JPanel digestOptionPanel;
 
 	private JTabbedPane modeTabbedPane;
 
 	private JTextField keyFieldA;
+
 	private JTextField keyFieldB;
 
 	private JTextField enOutputPath;
+
 	private JTextField deOutputPath;
-	
+
 	private JTextField hashField;
 
 	private JComboBox<Object> digestModeComboBox;
-	
+
 	public JTextField getKeyFieldA() {
 		return keyFieldA;
 	}
-	
+
 	public JTextField getKeyFieldB() {
 		return keyFieldB;
 	}
-	
+
 	public JTextField getEnOutputPath() {
 		return enOutputPath;
 	}
-	
+
 	public JTextField getDeOutputPath() {
 		return deOutputPath;
 	}
-	
+
 	public JTextField getHashField() {
 		return hashField;
 	}
@@ -107,21 +116,37 @@ public class ControllTabbedPanel extends JPanel {
 
 	private void createContentPane() {
 		setLayout(new BorderLayout());
+		setAlignmentX(LEFT_ALIGNMENT);
 		setPreferredSize(new Dimension(250, 220));
 
 		modeTabbedPane = new JTabbedPane(JTabbedPane.TOP);
 
-		createEncryptOptionPane();
-		createDecryptOptionPane();
+		enPane = createDESOptionPane(ENCRYPT);
+		dePane = createDESOptionPane(DECRYPT);
+		
 		createDigestOptionPane();
 
+		modeTabbedPane.add("º”√‹", enPane);
+		modeTabbedPane.add("Ω‚√‹", dePane);
 		add(modeTabbedPane, BorderLayout.CENTER);
 	}
 
-	private void createEncryptOptionPane() {
-		encryptOptionPanel = new JPanel();
-		encryptOptionPanel.setLayout(new BorderLayout(0, 0));
-
+	private JPanel createDESOptionPane(int mode) {
+		JPanel pane = new JPanel(new BorderLayout(0, 0));
+		JTextField key;
+		JTextField path;
+		
+		if (mode == ENCRYPT) {
+			key = keyFieldA = createKeyField(mode);
+			path = enOutputPath = createPathField(mode);
+		} else {
+			key = keyFieldB = createKeyField(mode);
+			path = deOutputPath = createPathField(mode);
+		}
+		
+		String labelKey = (mode == ENCRYPT) ? "º”√‹√‹‘ø" : "Ω‚√‹√‹‘ø";
+		String labelPath = " ‰≥ˆ¬∑æ∂";
+				
 		JPanel p1 = new JPanel();
 		p1.setAlignmentX(LEFT_ALIGNMENT);
 		JPanel p2 = new JPanel();
@@ -129,73 +154,98 @@ public class ControllTabbedPanel extends JPanel {
 		JPanel p3 = new JPanel();
 		p3.setAlignmentX(LEFT_ALIGNMENT);
 
-		JLabel keyValA = new JLabel("º”√‹√‹‘ø");
-		keyFieldA = createKeyField(ENCRYPT);
-		keyFieldA.setText("«Î ‰»Îº”√‹√‹‘ø");
-		JLabel outputPathA = new JLabel(" ‰≥ˆ¬∑æ∂");
-		enOutputPath = new JTextField(13);
-		enOutputPath.setEditable(false);
-		enOutputPath.setAutoscrolls(false);
-		enOutputPath.setPreferredSize(new Dimension(140, 30));
-		JButton btnSelectFileA = createSelectFileButton(ENCRYPT);
-		btnSelectFileA.setText(" ‰≥ˆ¬∑æ∂");
-		btnSelectFileA.setPreferredSize(new Dimension(80, 30));
+		JButton button = createSelectFileButton(mode, " ‰≥ˆ¬∑æ∂", new Dimension(80, 30));
 
-		p1.add(keyValA, BorderLayout.WEST);
-		p1.add(keyFieldA, BorderLayout.EAST);
-		p2.add(outputPathA, BorderLayout.WEST);
-		p2.add(enOutputPath, BorderLayout.EAST);
-		p3.add(btnSelectFileA, BorderLayout.NORTH);
+		p1.add(new JLabel(labelKey), BorderLayout.WEST);
+		p1.add(key, BorderLayout.EAST);
+		p2.add(new JLabel(labelPath), BorderLayout.WEST);
+		p2.add(path, BorderLayout.EAST);
+		p3.add(button, BorderLayout.NORTH);	
 
-		encryptOptionPanel.add(p1, BorderLayout.NORTH);
-		encryptOptionPanel.add(p2, BorderLayout.CENTER);
-		encryptOptionPanel.add(p3, BorderLayout.SOUTH);
-		
-		modeTabbedPane.add("º”√‹", encryptOptionPanel);
+		pane.add(p1, BorderLayout.NORTH);
+		pane.add(p2, BorderLayout.CENTER);
+		pane.add(p3, BorderLayout.SOUTH);
+
+		return pane;
+	}
+	
+	private Action createSelectFileAction(final int mode) {
+		Action a = new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser fileChooser = new JFileChooser();
+				fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+				int i = fileChooser.showOpenDialog(fileChooser);
+				if (i == JFileChooser.APPROVE_OPTION) {
+					String selectedFilepath = fileChooser.getSelectedFile()
+							.getAbsolutePath();
+					File selectedFile = new File(selectedFilepath);
+					if (mode == ENCRYPT) {
+						enOutputPath.setText(selectedFile.getPath());
+					} else {
+						deOutputPath.setText(selectedFile.getPath());
+					}
+				}
+			}
+		};
+
+		return a;
 	}
 
-	private void createDecryptOptionPane() {
-		decryptOptionPanel = new JPanel();
-		decryptOptionPanel.setLayout(new BorderLayout(0, 0));
+	private JTextField createKeyField(int mode) {
+		JTextField textField = new JTextField(13);
+
+		String accessibleName;
+		String text;
 		
-		JPanel p1 = new JPanel();
-		p1.setAlignmentX(LEFT_ALIGNMENT);
-		JPanel p2 = new JPanel();
-		p2.setAlignmentX(LEFT_ALIGNMENT);
-		JPanel p3 = new JPanel();
-		p3.setAlignmentX(LEFT_ALIGNMENT);
-		JLabel keyValB = new JLabel("Ω‚√‹√‹‘ø");
+		if (mode == ENCRYPT) {
+			accessibleName = "TabPane.En.Key";
+			text = "«Î ‰»Îº”√‹√‹‘ø";
+		} else {
+			accessibleName = "TabPane.De.Key";
+			text = "«Î ‰»ÎΩ‚√‹√‹‘ø";
+		}
 
-		keyFieldB = createKeyField(DECRYPT);
-		keyFieldB.setText("«Î ‰»ÎΩ‚√‹√‹‘ø");
+		textField.getAccessibleContext().setAccessibleName(accessibleName);
+		textField.setPreferredSize(new Dimension(140, 30));
+		textField.addFocusListener(createHintTextFieldFocusListener(mode));
+		textField.setText(text);
 
-		JLabel outputPathB = new JLabel(" ‰≥ˆ¬∑æ∂");
-		deOutputPath = new JTextField(13);
-		deOutputPath.setEditable(false);
-		deOutputPath.setAutoscrolls(false);
-		deOutputPath.setPreferredSize(new Dimension(140, 30));
-		
-		JButton btnSelectFileB = createSelectFileButton(DECRYPT);
-		btnSelectFileB.setText("‰Ø¿¿Œƒº˛");
-		btnSelectFileB.setPreferredSize(new Dimension(80, 30));
+		return textField;
+	}
 
-		p1.add(keyValB, BorderLayout.WEST);
-		p1.add(keyFieldB, BorderLayout.EAST);
-		p2.add(outputPathB, BorderLayout.WEST);
-		p2.add(deOutputPath, BorderLayout.EAST);
-		p3.add(btnSelectFileB, BorderLayout.NORTH);
+	private JTextField createPathField(int mode) {
+		JTextField textField = new JTextField(13);
 
-		decryptOptionPanel.add(p1, BorderLayout.NORTH);
-		decryptOptionPanel.add(p2, BorderLayout.CENTER);
-		decryptOptionPanel.add(p3, BorderLayout.SOUTH);
+		String accessibleName = (mode == ENCRYPT) ? "TabPane.En.OutputPath"
+				: "TabPane.De.OutputPath";
 
-		modeTabbedPane.add("Ω‚√‹", decryptOptionPanel);
+		textField.getAccessibleContext().setAccessibleName(accessibleName);
+		textField.setEditable(false);
+		textField.setAutoscrolls(false);
+		textField.setPreferredSize(new Dimension(140, 30));
+
+		return textField;
+	}
+
+	private JButton createSelectFileButton(int mode, String text, Dimension d) {
+		JButton button = new JButton();
+
+		button.setAction(createSelectFileAction(mode));
+		button.setText(text);
+		button.setPreferredSize(d);
+
+		return button;
 	}
 
 	private void createDigestOptionPane() {
 		digestOptionPanel = new JPanel();
 		digestOptionPanel.setLayout(new BorderLayout(0, 0));
-		
+
 		JPanel p1 = new JPanel();
 		p1.setAlignmentX(LEFT_ALIGNMENT);
 		JPanel p2 = new JPanel();
@@ -205,7 +255,7 @@ public class ControllTabbedPanel extends JPanel {
 		hashField = new JTextField(13);
 		hashField.setPreferredSize(new Dimension(140, 30));
 		JLabel modeVal = new JLabel("ƒ£ Ω—°‘Ò");
-		final Object[] HASH_MODE = {"MD5", "SHA-1", "CRC32"};
+		final Object[] HASH_MODE = { "MD5", "SHA-1", "CRC32" };
 		digestModeComboBox = new JComboBox<Object>(HASH_MODE);
 		digestModeComboBox.setPreferredSize(new Dimension(150, 30));
 		digestModeComboBox.setSelectedIndex(0);
@@ -217,7 +267,7 @@ public class ControllTabbedPanel extends JPanel {
 
 		digestOptionPanel.add(p1, BorderLayout.NORTH);
 		digestOptionPanel.add(p2, BorderLayout.CENTER);
-		
+
 		modeTabbedPane.add("∆•≈‰’™“™", digestOptionPanel);
 	}
 
@@ -226,7 +276,7 @@ public class ControllTabbedPanel extends JPanel {
 				TitledBorder.LEADING, TitledBorder.TOP, null, null);
 		setBorder(border);
 	}
-	
+
 	private FocusListener createHintTextFieldFocusListener(final int mode) {
 		FocusListener hint = new FocusListener() {
 
@@ -253,50 +303,4 @@ public class ControllTabbedPanel extends JPanel {
 		return hint;
 	}
 
-	public JTextField createKeyField(final int mode) {
-		JTextField k = new JTextField(13);
-		k.setPreferredSize(new Dimension(140, 30));
-		k.addFocusListener(createHintTextFieldFocusListener(mode));
-		if (mode == ENCRYPT) {
-			keyFieldA = k;
-		} else {
-			keyFieldB = k;
-		}
-		return k;
-	}
-	
-	private Action createSelectFileAction(final int mode) {
-		Action a = new AbstractAction() {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JFileChooser fileChooser = new JFileChooser();
-				fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				
-				int i = fileChooser.showOpenDialog(fileChooser);
-				if (i == JFileChooser.APPROVE_OPTION) {
-					String selectedFilepath = fileChooser.getSelectedFile()
-							.getAbsolutePath();
-					File selectedFile = new File(selectedFilepath);
-					if (mode == ENCRYPT) {
-						enOutputPath.setText(selectedFile.getPath());
-					} else {
-						deOutputPath.setText(selectedFile.getPath());
-					}
-				}
-			}
-
-		};
-
-		return a;
-	}
-
-	public JButton createSelectFileButton(final int mode) {
-		JButton b = new JButton();
-		b.setPreferredSize(new Dimension(50, 30));
-		b.setAction(createSelectFileAction(mode));
-		return b;
-	}
 }

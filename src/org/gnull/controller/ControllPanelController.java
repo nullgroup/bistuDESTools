@@ -14,7 +14,8 @@ public class ControllPanelController {
 	private ControllPanel ctrlPane;
 	
 	private ArgumentsSet set;
-
+	
+	/*sa « */
 	private HashMap<Object, Action> actionsMapA;
 	private HashMap<Object, Action> actionsMapB;
 	private HashMap<Object, Action> actionsMapC;

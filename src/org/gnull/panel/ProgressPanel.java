@@ -12,34 +12,31 @@ import javax.swing.JProgressBar;
 
 import org.gnull.controller.ProgressPanelController;
 
+/**
+ * @author OSX
+ *
+ */
 public class ProgressPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * 
+	 */
 	public MessagePanel messagePane;
-	public JProgressBar progressbar;
+
+	/**
+	 * 
+	 */
+	public JProgressBar progressBar;
 
 	// tmp
 	public JButton startButton;
 
+	/**
+	 * 
+	 */
 	private ProgressPanelController controller;
-
-	public static void main(String[] args) {
-		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				JFrame f = new JFrame();
-				ProgressPanel p = new ProgressPanel();
-
-				f.getContentPane().add(p);
-				f.pack();
-				f.setSize(300, 100);
-				f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-				f.pack();
-				f.setVisible(true);
-			}
-		});
-	}
 
 	public ProgressPanelController getController() {
 		return controller;
@@ -56,28 +53,30 @@ public class ProgressPanel extends JPanel {
 
 		controller = new ProgressPanelController(this);
 
-		progressbar = createProgressBar(0, 100, JProgressBar.HORIZONTAL);
-		progressbar.setStringPainted(true);
+		progressBar = createProgressBar(0, 100, JProgressBar.HORIZONTAL, true);
 
-		startButton = createStartButton("运行", "ProgressPanel.Start");
+		startButton = createStartButton("运行", "ProgressPanel.StartButton");
 
-		add(progressbar, BorderLayout.CENTER);
+		add(progressBar, BorderLayout.CENTER);
 		add(startButton, BorderLayout.SOUTH);
 	}
 
-	protected JProgressBar createProgressBar(int min, int max, int orient) {
-		JProgressBar bar = new JProgressBar(orient);
+	protected JProgressBar createProgressBar(int minValue, int maxValue, int orient,
+			boolean stringPainted) {
+		JProgressBar bar = new JProgressBar();
 
-		bar.setMaximum(max);
-		bar.setMinimum(min);
-		bar.setValue(0);
+		bar.setMaximum(maxValue);
+		bar.setMinimum(minValue);
+		bar.setValue(maxValue - minValue);
+		bar.setOrientation(orient);
+		bar.setStringPainted(stringPainted);
 
 		return bar;
 	}
-	
+
 	private JButton createStartButton(String text, String actionCommand) {
 		JButton startButton = new JButton();
-		
+
 		Action a = new AbstractAction() {
 			private static final long serialVersionUID = 1L;
 
@@ -86,11 +85,30 @@ public class ProgressPanel extends JPanel {
 				controller.compute();
 			}
 		};
-		
+
 		startButton.addActionListener(a);
 		startButton.setText(text);
 		startButton.setActionCommand(actionCommand);
-		
+
 		return startButton;
+	}
+
+	public static void main(String[] args) {
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				// Create and set up the window.
+				JFrame frame = new JFrame("ProgressPanelDemo");
+				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+				// Create and set up the content pane.
+				javax.swing.JComponent newContentPane = new ProgressPanel();
+				newContentPane.setOpaque(true); // content panes must be opaque
+				frame.setContentPane(newContentPane);
+				frame.setSize(300, 100);
+
+				// Display the window.
+				frame.setVisible(true);
+			}
+		});
 	}
 }

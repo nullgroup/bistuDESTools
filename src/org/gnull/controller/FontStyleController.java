@@ -22,6 +22,8 @@ import javax.swing.text.StyledEditorKit;
  *
  */
 public final class FontStyleController {
+	
+	private static Font font;
 
 	public static Font getDefaultFont() {
 		return font;
@@ -32,10 +34,9 @@ public final class FontStyleController {
 	}
 
 	public FontStyleController() {
-		// TODO Auto-generated constructor stub
+
 	}
 
-	private static Font font;
 
 	/**
 	 * 设置字体种类, 需要给出一个指针指向目标textPane
