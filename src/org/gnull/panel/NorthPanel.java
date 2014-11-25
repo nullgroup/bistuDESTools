@@ -6,6 +6,8 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -30,20 +32,25 @@ import javax.swing.event.ChangeListener;
 
 import org.gnull.util.Constants;
 import org.gnull.util.QRCodeUtil;
+import org.jb2011.lnf.beautyeye.ch3_button.BEButtonUI;
 
+/**
+ * @author OSX
+ *
+ */
 public class NorthPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	JComboBox<String> cbFix;
+	JComboBox<String> comboBoxErrorCorrect;
 
-	JCheckBox chckbxType;
+	JCheckBox checkBoxAutoVerison;
 
-	JComboBox<String> cbAuto;
+	JComboBox<String> comboBoxVersion;
 
-	JSpinner spinSize;
+	JSpinner spinnerSize;
 
-	JComboBox<String> cbEncodeType;
+	JComboBox<String> checkBoxEncodeType;
 	
 	Action generateQrImage;
 	
@@ -53,6 +60,10 @@ public class NorthPanel extends JPanel {
 	
 	ChangeListener autoResizeListener;
 	
+	private int curVersion = 7;
+	
+	private int curSize = 45;
+	
 	private QRCodeUtil qrUtil;
 
 	public NorthPanel() {
@@ -60,72 +71,94 @@ public class NorthPanel extends JPanel {
 		setLayout(new BorderLayout(0, 0));
 		qrUtil = new QRCodeUtil();
 
-		JPanel qrImagePane = createQrImagePanel(new BorderLayout(0, 0));
-		JPanel paramPane = createParamPanel(new GridLayout(4, 1, 0, 0));
-		
-		qrImagePane.setPreferredSize(new Dimension(300, 200));
+		JPanel qrImagePane = createQrImagePanel(new BorderLayout(0, 0), new Dimension(300, 200));
+		JPanel paramPane = createParamPanel(new GridLayout(4, 1, 0, 0), null);
 
 		add(new JScrollPane(qrImagePane), BorderLayout.WEST);
 		add(new JScrollPane(paramPane), BorderLayout.CENTER);
 	}
 
-	private JPanel createParamPanel(LayoutManager layout) {
+	private JPanel createParamPanel(LayoutManager layout, Dimension d) {
 		JPanel pane = new JPanel(layout);
 
 		JPanel fixPane = createBorderPanel(pane, new GridLayout(2, 1), "´íÎóÐÞÕý");
 		pane.add(fixPane);
 		
-		Dimension d = new Dimension(120, 30);
+		Dimension dim = new Dimension(120, 30);
 
-		cbFix = new JComboBox<String>();
-		cbFix.setModel(new DefaultComboBoxModel<String>(Constants.ERROR_FIX));
-		cbFix.setPreferredSize(d);
-		fixPane.add(cbFix);
+		comboBoxErrorCorrect = new JComboBox<String>();
+		comboBoxErrorCorrect.setModel(new DefaultComboBoxModel<String>(Constants.ERROR_CORRECT));
+		comboBoxErrorCorrect.setPreferredSize(dim);
+		fixPane.add(comboBoxErrorCorrect);
 
-		JPanel typePane = createBorderPanel(pane, new GridLayout(2, 2), "ÐÍºÅ");
-		pane.add(typePane);
+		JPanel versionPane = createBorderPanel(pane, new GridLayout(2, 2), "°æ±¾");
+		pane.add(versionPane);
 
-		cbAuto = new JComboBox<String>(new DefaultComboBoxModel<String>(
-				Constants.AUTO));
-		cbAuto.setPreferredSize(d);
-		typePane.add(cbAuto);
+		comboBoxVersion = new JComboBox<String>(new DefaultComboBoxModel<String>(
+				Constants.QRCODE_VERSION));
+		comboBoxVersion.setPreferredSize(dim);
+		comboBoxVersion.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if (spinnerSize != null) {
+					String versionStr = (String) comboBoxVersion.getSelectedItem();
+					curVersion = Integer.parseInt(versionStr);
+					
+					String curSizeStr = lblSize.getText().substring(6);
+					curSize = Integer.parseInt(curSizeStr.split("x")[0].trim());
+					
+					while ((21 + (curVersion - 1) * 4) > curSize) {
+						curSize += 4;
+					}
+					lblSize.setText("Í¼Æ¬ÏñËØ: " + curSize + " x " + curSize);
+				}
+			}
+			
+		});
+		comboBoxVersion.setSelectedItem("7");
+		versionPane.add(comboBoxVersion);
 
 		
-		chckbxType = new JCheckBox("×Ô¶¯Ëõ·Å");
+		checkBoxAutoVerison = new JCheckBox("×Ô¶¯Ëõ·Å");
 		autoResizeListener = addAutoSize();
 		
-		chckbxType.setPreferredSize(d);
-		chckbxType.addChangeListener(autoResizeListener);
-		typePane.add(chckbxType);
+		checkBoxAutoVerison.setPreferredSize(dim);
+		checkBoxAutoVerison.addChangeListener(autoResizeListener);
+		versionPane.add(checkBoxAutoVerison);
 
 		JPanel sizePane = createBorderPanel(pane, new GridLayout(2, 1),
 				"³ß´ç");
 		pane.add(sizePane);
 
-		lblSize = new JLabel("Í¼Æ¬ÏñËØ: 41 x 41");
+		lblSize = new JLabel("Í¼Æ¬ÏñËØ: 45 x 45"); // <-
 		
-		spinSize = new JSpinner(new SpinnerNumberModel(1, 1, 99, 1));
-		spinSize.setPreferredSize(d);
-		spinSize.addChangeListener(new ChangeListener() {
+		spinnerSize = new JSpinner(new SpinnerNumberModel(1, 1, 99, 1));
+		spinnerSize.setPreferredSize(dim);
+		spinnerSize.addChangeListener(new ChangeListener() {
 
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				int[] size = getSizeArray();
+				if (curVersion != 0) {
+					curSize = (21 + (curVersion - 1) * 4) * (int) spinnerSize.getValue();
+				} else {
+					curSize = 64 * (int) spinnerSize.getValue();
+				}
 				
-				lblSize.setText("Í¼Æ¬ÏñËØ: " + size[0] + " x " + size[1]);
+				lblSize.setText("Í¼Æ¬ÏñËØ: " + curSize + " x " + curSize);
 			}
 			
 		});
-		sizePane.add(spinSize);
+		sizePane.add(spinnerSize);
 		sizePane.add(lblSize);
 
 		JPanel encodePane = createBorderPanel(pane, new GridLayout(2, 1), "±àÂë");
 		pane.add(encodePane);
 
-		cbEncodeType = new JComboBox<String>(new DefaultComboBoxModel<String>(
+		checkBoxEncodeType = new JComboBox<String>(new DefaultComboBoxModel<String>(
 				Constants.ENCODE));
-		cbEncodeType.setPreferredSize(d);
-		encodePane.add(cbEncodeType);
+		checkBoxEncodeType.setPreferredSize(dim);
+		encodePane.add(checkBoxEncodeType);
 
 		return pane;
 	}
@@ -140,7 +173,7 @@ public class NorthPanel extends JPanel {
 		return pane;
 	}
 
-	private JPanel createQrImagePanel(LayoutManager layout) {
+	private JPanel createQrImagePanel(LayoutManager layout, Dimension d) {
 		JPanel pane = new JPanel(layout);
 
 		pane.setBorder(new TitledBorder(UIManager
@@ -151,6 +184,7 @@ public class NorthPanel extends JPanel {
 		qrCodePane = new QRImagePanel();
 		
 		pane.add(qrCodePane, BorderLayout.CENTER);
+		pane.setPreferredSize(d);
 
 		return pane;
 	}
@@ -164,6 +198,8 @@ public class NorthPanel extends JPanel {
 		button.setAction(generateQrImage);
 		button.setText(text);
 		button.setFont(new Font(font.getName(), Font.BOLD, font.getSize()));
+		button.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.green));
+		
 		parent.add(button, orient);
 		
 		return button;
@@ -176,22 +212,39 @@ public class NorthPanel extends JPanel {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// set params
-				// paint
-				String errorCorrect = (String) cbFix.getSelectedItem();
-				String versionStr = (String) cbAuto.getSelectedItem();
-				int version = (versionStr.equals("×Ô¶¯")) ? 0 : Integer.parseInt(versionStr);
+				BufferedImage bi = null;
 				
-				int[] size = getSizeArray();
+				boolean flag = true;
+				while (flag) {
+					try {
+						flag = false;
+
+						String errorCorrect = (String) comboBoxErrorCorrect.getSelectedItem();
+						
+						String encodeMode = (String) checkBoxEncodeType.getSelectedItem();
+						
+						String content = "mailto:sample@163.com";
+
+						qrUtil.setErrorCorrect(errorCorrect.charAt(0));
+						qrUtil.setEncodeMode(parseEnCodeMode(encodeMode));
+						qrUtil.setVersion(curVersion);
+						System.out.println(curVersion);
+						
+						bi = qrUtil.createImage(content, curSize, curSize);
+						
+						qrCodePane.setShowImage(bi);
+					} catch (Exception e2) {
+						if (e2 instanceof ArrayIndexOutOfBoundsException) {
+							flag = true;
+							int i = comboBoxVersion.getSelectedIndex();
+							if (i < 40) {
+								comboBoxVersion.setSelectedIndex(i + 1);
+							}
+						}
+					}
+				}
 				
-				qrUtil.setErrorCorrect(errorCorrect.charAt(0));
-				qrUtil.setEncodeMode('B');
-				qrUtil.setVersion(version);
-				
-				String content = "hello world";
-				BufferedImage bi = qrUtil.createImage(content, size[0], size[1]);
-				qrCodePane.setShowImage(bi);
-				
+				//////////////////////////////////////
 				File f = new File("d:\\outQrCode.png");
 				try {
 					ImageIO.write(bi, "png", f);
@@ -199,20 +252,17 @@ public class NorthPanel extends JPanel {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
+				//////////////////////////////////////
+			}
+
+			////////////////////////////////////////////////
+			private char parseEnCodeMode(String encodeMode) {
+				// TODO Auto-generated method stub
+				return 'B';
 			}
 		};
 		
 		return a;
-	}
-	
-	private int[] getSizeArray() {
-		int[] size = new int[2];
-		
-		int multiple = (int) spinSize.getValue();
-		
-		size[0] = size[1] = multiple * 41;
-		
-		return size;
 	}
 	
 	private ChangeListener addAutoSize() {
@@ -220,15 +270,19 @@ public class NorthPanel extends JPanel {
 
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				if (chckbxType.isSelected()) {
-					cbAuto.setEnabled(false);
-					qrUtil.setVersion(0);
+				if (checkBoxAutoVerison.isSelected()) {
+					comboBoxVersion.setEnabled(false);
+					curVersion = 0;
+					curSize = 64 * (int) spinnerSize.getValue();
 				} else {
-					cbAuto.setEnabled(true);
-					String i = (String) cbAuto.getSelectedItem();
-					int version = (i.equals("×Ô¶¯")) ? 0 : Integer.parseInt(i);
-					qrUtil.setVersion(version);
+					comboBoxVersion.setEnabled(true);
+					String version = (String) comboBoxVersion.getSelectedItem();
+					int v = Integer.parseInt(version);
+					curVersion = v;
+					curSize = (21 + (curVersion - 1) * 4) * (int) spinnerSize.getValue();
 				}
+
+				lblSize.setText("Í¼Æ¬ÏñËØ: " + curSize + " x " + curSize);
 			}
 			
 		};
@@ -236,6 +290,10 @@ public class NorthPanel extends JPanel {
 		return c;
 	}
 
+	/**
+	 * Main Method for Test
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			public void run() {

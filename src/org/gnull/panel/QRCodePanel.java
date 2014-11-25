@@ -9,6 +9,10 @@ import javax.swing.JPanel;
 import org.gnull.controller.FontStyleController;
 import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
 
+/**
+ * @author OSX
+ *
+ */
 public class QRCodePanel extends JPanel {
 
 ;	private static final long serialVersionUID = 1L;
@@ -34,17 +38,17 @@ public class QRCodePanel extends JPanel {
 		setLookAndFeel();
 		setLayout(new BorderLayout(0, 0));
 
-		JPanel contentPane = new JPanel();
-		add(contentPane);
-		contentPane.setLayout(new BorderLayout(0, 0));
-		
 		southPane = new SouthPanel();
-		contentPane.add(southPane, BorderLayout.SOUTH);
+		add(southPane, BorderLayout.SOUTH);
 		
 		northPane = new NorthPanel();
-		contentPane.add(northPane, BorderLayout.CENTER);
+		add(northPane, BorderLayout.CENTER);
 	}
 
+	/**
+	 * Main Method for Test
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
