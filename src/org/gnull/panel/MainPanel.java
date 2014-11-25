@@ -77,7 +77,7 @@ public class MainPanel extends JFrame {
 		add(progressPane, BorderLayout.SOUTH);
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(400, 50, 750, 580);
+		setBounds(400, 50, 550, 580);
 		setVisible(true);
 	}
 

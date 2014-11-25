@@ -4,5 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/BeautyEyeUI"/>
 	<classpathentry kind="lib" path="lib/beautyeye_lnf.jar"/>
+	<classpathentry kind="lib" path="lib/qrcodeJp.jar"/>
+	<classpathentry kind="lib" path="lib/QrcodeSwetake.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
