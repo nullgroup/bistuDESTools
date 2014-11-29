@@ -2,14 +2,13 @@ package org.gnull.entity;
 
 import java.io.File;
 
-import javax.swing.SwingWorker;
-
 import org.gnull.md5.MD5Controller;
 
 public class ComputeTask extends AbstractTask {
 
 	private String result;
 	
+	@SuppressWarnings("unused")
 	private String targetDigest;
 
 	private int mode;

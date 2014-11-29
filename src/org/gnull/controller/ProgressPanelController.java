@@ -15,6 +15,7 @@ public final class ProgressPanelController implements PropertyChangeListener {
 
 	private ProgressPanel panel;
 
+	@SuppressWarnings("unused")
 	private MessagePacket packet = new MessagePacket();
 
 	public ProgressPanelController(ProgressPanel panel) {

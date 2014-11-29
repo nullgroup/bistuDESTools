@@ -1,6 +1,7 @@
 package org.gnull.panel;
 
 import java.awt.BorderLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -93,6 +94,7 @@ public class MessagePanel extends JPanel {
 
 		pane.setEditable(editable);
 		pane.setDocument(document);
+		pane.setMargin(new Insets(10, 10, 10, 10));
 
 		return pane;
 	}

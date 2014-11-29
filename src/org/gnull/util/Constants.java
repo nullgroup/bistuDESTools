@@ -15,7 +15,7 @@ public class Constants {
 			"29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39",
 			"40" };
 
-	public static final String[] ENCODE = { "docomo", "SoftBank", "¶à±àÂë" };
+	public static final String[] ENCODE = { "Binary", "Alphanumeric", "Numeric", "Kanji" };
 
 	public static final String[][] FILE_NAME_EXTENSION_FILTER = {
 			{ "PNGÍ¼Ïñ(*.png)", "png" }, { "JPGÍ¼Ïñ(*.jpg/jpeg)", "jpg/jpeg" },

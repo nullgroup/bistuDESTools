@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
-import java.awt.Rectangle;
 
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -16,14 +15,27 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+
+import org.gnull.des.DESUtil;
 
 public class SouthPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	JTextField tfName;
+	static public final int PLAIN_TEXT_OPTION = 0;
+	static public final int WEB_PAGE_OPTION = 1;
+	static public final int EMAIL_OPTION = 2;
+	static public final int CONTACTS_OPTION = 3;
 
-	JTextField textField_1;
+	static public final char SEPATATOR = ' ';
+
+	JTabbedPane southTabPane;
+
+	JTextField tfName1;
+
+	JTextField tfName2;
 
 	JTextField tfPhone1;
 
@@ -37,8 +49,6 @@ public class SouthPanel extends JPanel {
 
 	JPasswordField pswfKey;
 
-	JTextField tfSiteName;
-
 	JTextField tfUrl;
 
 	JTextField tfMailto;
@@ -47,35 +57,134 @@ public class SouthPanel extends JPanel {
 
 	JTextArea tfBody;
 
+	JTextPane msgPane;
+
 	public SouthPanel() {
 		createSouthPane();
+	}
+
+	public String getContentByTabbedIndex() {
+		String content = null;
+
+		int i = southTabPane.getSelectedIndex();
+
+		switch (i) {
+		case PLAIN_TEXT_OPTION:
+			content = getPlainTextContent();
+			break;
+		case WEB_PAGE_OPTION:
+			content = getWebPageContent();
+			break;
+		case EMAIL_OPTION:
+			content = getEmailContent();
+			break;
+		case CONTACTS_OPTION:
+			content = getoContactsContent();
+			break;
+		}
+
+		return content;
+	}
+
+	private String getPlainTextContent() {
+		StringBuilder b = new StringBuilder(128);
+		
+		String key = new String(pswfKey.getPassword());
+		
+		if (!key.equals("") && !msgPane.getText().equals("")) {
+			try {
+				b.append(DESUtil.encrypt(msgPane.getText(), key));
+			} catch (Exception e) {
+				if (e instanceof java.security.InvalidKeyException) {
+					return null;
+				}
+			}
+		} else if (!msgPane.getText().equals("")) {
+			b.append(msgPane.getText());
+		}
+
+		return b.toString();
+	}
+
+	private String getWebPageContent() {
+		StringBuilder b = new StringBuilder(128);
+
+		b.append(tfUrl.getText());
+
+		return b.toString();
+	}
+
+	private String getEmailContent() {
+		StringBuilder b = new StringBuilder(128);
+
+		if (!tfMailto.getText().equals("") || !tfSubject.getText().equals("")
+				|| !tfBody.getText().equals("")) {
+
+			b.append("MAILTO:").append(tfMailto.getText()).append(SEPATATOR);
+
+			b.append("SUBJECT:").append(tfSubject.getText()).append(SEPATATOR);
+
+			b.append("BODY:").append(tfBody.getText());
+
+		}
+
+		return b.toString();
+	}
+
+	private String getoContactsContent() {
+		StringBuilder b = new StringBuilder(128);
+
+		if (!tfRemark.getText().equals("") || !tfName1.getText().equals("")
+				|| !tfName2.getText().equals("")
+				|| !tfPhone1.getText().equals("")
+				|| !tfPhone2.getText().equals("")
+				|| !tfEmail1.getText().equals("")
+				|| !tfEmail2.getText().equals("")) {
+
+			b.append("MEMORY:").append(tfRemark.getText()).append(SEPATATOR);
+
+			b.append("NAME1:").append(tfName1.getText()).append(SEPATATOR);
+
+			b.append("NAME2:").append(tfName2.getText()).append(SEPATATOR);
+
+			b.append("TEL1:").append(tfPhone1.getText()).append(SEPATATOR);
+
+			b.append("TEL2:").append(tfPhone2.getText()).append(SEPATATOR);
+
+			b.append("MAIL1:").append(tfEmail1.getText()).append(SEPATATOR);
+
+			b.append("MAIL2:").append(tfEmail2.getText());
+		}
+
+		return b.toString();
+
 	}
 
 	private void createSouthPane() {
 		setLayout(new FlowLayout());
 
-		JTabbedPane southTabPane = new JTabbedPane(JTabbedPane.TOP);
+		southTabPane = new JTabbedPane(JTabbedPane.TOP);
 		southTabPane.setPreferredSize(new Dimension(500, 260));
 
 		Dimension dLabel = new Dimension(60, 25);
 		Dimension dTextField = new Dimension(150, 25);
 
-		JPanel telPane = createTelephonePane(new GridLayout(7, 1, 0, 0),
-				dLabel, dTextField);
-		southTabPane.addTab("电话簿信息", null, telPane, null);
-
-		JPanel emailPane = createEmailPane(new BorderLayout(0, 0), dLabel,
+		JPanel textPane = createTextPane(new BorderLayout(0, 0), dLabel,
 				dTextField);
-		southTabPane.addTab("电子邮件", null, emailPane, null);
+		southTabPane.addTab("文本信息", null, textPane, null);
 
 		JPanel webPane = createWebPane(new BorderLayout(0, 0), dLabel,
 				dTextField);
 		southTabPane.addTab("网页信息", null, webPane, null);
 
-		JPanel textPane = createTextPane(new BorderLayout(0, 0), dLabel,
+		JPanel emailPane = createEmailPane(new BorderLayout(0, 0), dLabel,
 				dTextField);
-		southTabPane.addTab("文本信息", null, textPane, null);
-		
+		southTabPane.addTab("电子邮件", null, emailPane, null);
+
+		JPanel telPane = createTelephonePane(new GridLayout(7, 1, 0, 0),
+				dLabel, dTextField);
+		southTabPane.addTab("电话簿信息", null, telPane, null);
+
 		add(southTabPane, BorderLayout.CENTER);
 	}
 
@@ -83,7 +192,7 @@ public class SouthPanel extends JPanel {
 			Dimension dTextField) {
 		JPanel pane = new JPanel(layout);
 
-		JTextPane msgPane = new JTextPane();
+		msgPane = new JTextPane();
 		pane.add(msgPane, BorderLayout.CENTER);
 
 		JPanel panel_13 = new JPanel();
@@ -95,8 +204,18 @@ public class SouthPanel extends JPanel {
 		pswfKey = new JPasswordField(10);
 		panel_13.add(pswfKey);
 
-		JCheckBox chckbxIsEncrypt = new JCheckBox("加密");
+		final JCheckBox chckbxIsEncrypt = new JCheckBox("加密");
 		panel_13.add(chckbxIsEncrypt);
+
+		pswfKey.addCaretListener(new CaretListener() {
+
+			@Override
+			public void caretUpdate(CaretEvent e) {
+				chckbxIsEncrypt.setSelected(pswfKey.getPassword() != null
+						&& pswfKey.getPassword().length != 0);
+			}
+
+		});
 
 		return pane;
 	}
@@ -105,20 +224,15 @@ public class SouthPanel extends JPanel {
 			Dimension dTF) {
 		JPanel pane = new JPanel(layout);
 
-		JPanel nPane = new JPanel(new GridLayout(2, 1, 0, 0));
+		JPanel nPane = new JPanel(new GridLayout(1, 1, 0, 0));
 		pane.add(nPane, BorderLayout.NORTH);
 
 		FlowLayout flowLayout = new FlowLayout();
 
-		JPanel p1 = new JPanel(flowLayout);
-		JLabel lblSiteName = addLabel(p1 , "网站名称", "", dL);
-		tfSiteName = addTextField(p1, lblSiteName.getText(), 35, dTF);
-		nPane.add(p1);
-
-		JPanel p2 = new JPanel(flowLayout);
-		JLabel lblUrl = addLabel(p2 , "URL", "", dL);
-		tfUrl = addTextField(p2, lblUrl.getText(), 35, dTF);
-		nPane.add(p2);
+		JPanel p = new JPanel(flowLayout);
+		JLabel lblUrl = addLabel(p, "URL", "", dL);
+		tfUrl = addTextField(p, lblUrl.getText(), 35, dTF);
+		nPane.add(p);
 
 		return pane;
 	}
@@ -133,7 +247,7 @@ public class SouthPanel extends JPanel {
 		FlowLayout flowLayout = new FlowLayout();
 
 		JPanel p1 = new JPanel(flowLayout);
-		JLabel lblMailto = addLabel(p1 , "地址", "", dL);
+		JLabel lblMailto = addLabel(p1, "地址", "", dL);
 		tfMailto = addTextField(p1, lblMailto.getText(), 35, dTF);
 		nPane.add(p1);
 
@@ -143,6 +257,7 @@ public class SouthPanel extends JPanel {
 		nPane.add(p2);
 
 		JPanel p3 = new JPanel(flowLayout);
+		@SuppressWarnings("unused")
 		JLabel lblBody = addLabel(p3, "正文", "", dL);
 		nPane.add(p3);
 
@@ -150,8 +265,7 @@ public class SouthPanel extends JPanel {
 		tfBody.setLineWrap(true);
 		tfBody.setPreferredSize(new Dimension(200, 25));
 		tfBody.setColumns(35);
-		
-		Rectangle r = tfBody.getBounds();
+
 		p3.add(tfBody);
 		nPane.add(p3);
 
@@ -161,17 +275,17 @@ public class SouthPanel extends JPanel {
 	private JPanel createTelephonePane(LayoutManager layout, Dimension dL,
 			Dimension dTF) {
 		JPanel pane = new JPanel(layout);
-		
+
 		FlowLayout flowLayout = new FlowLayout();
 
 		JPanel p1 = new JPanel(flowLayout);
 		JLabel lblName = addLabel(p1, "姓名", "", dL);
-		tfName = addTextField(p1, lblName.getText(), 35, dTF);
+		tfName1 = addTextField(p1, lblName.getText(), 35, dTF);
 		pane.add(p1);
 
 		JPanel p2 = new JPanel(flowLayout);
 		JLabel lblNewLabel_2 = addLabel(p2, "注音", "", dL);
-		textField_1 = addTextField(p2, lblNewLabel_2.getText(), 35, dTF);
+		tfName2 = addTextField(p2, lblNewLabel_2.getText(), 35, dTF);
 		pane.add(p2);
 
 		JPanel p3 = new JPanel(flowLayout);
@@ -221,10 +335,10 @@ public class SouthPanel extends JPanel {
 
 		return field;
 	}
-	
+
 	public String getEmailAsString() {
 		StringBuilder b = new StringBuilder(256);
-		
+
 		return b.toString();
 	}
 

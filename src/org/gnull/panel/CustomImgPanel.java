@@ -86,7 +86,6 @@ public class CustomImgPanel extends JPanel {
 		f.dispose();
 		
 		MainPanel a = new MainPanel();
-		a.setLocationRelativeTo(f);
 		a.setVisible(true);;
 	}
 }
